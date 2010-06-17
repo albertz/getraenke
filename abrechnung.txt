@@ -1,22 +1,5 @@
 # Bestellnummer: 0240 571633
 
-# Pfandpreise: http://de.wikipedia.org/wiki/Flaschenpfand
-
-# In dieser Datei stehen sowohl alle Bestellungen als auch die Getränkeabrechnungen (wer viel viel getrunken hat).
-# Die Datei wird von abrechnung.py eingelesen und verarbeitet. Dort wird dann ausgegeben, wer wie viel bezahlen muss, wie die Kasse gerade aussieht, etc.
-
-# Der Verlust bei einer Abrechnung berechnet sich so:
-#   GeldInKasse ist i.d.R. negativ (Kaution ist nicht mitgerechnet).
-#   WertVonGetränken ist der Wert der noch vorhandenen Getränken (positiv).
-#   Abrechnungsbetrag ist das, was getrunken wurde, in Geld.
-#   Pfandrückgabe ist die Pfandrückgabe von der letzten Rechnung.
-#   Differenz = Abrechnungsbetrag + GeldInKasse + WertVonGetränken + Pfandrückgabe
-#   Verlust = -Differenz
-# Die Verlustberechnung ist nicht ganz exakt, aber vereinfacht die Abrechnung deutlich und versichert, dass in der Kasse niemals Schulden entstehen.
-# Der Verlust wird bei jeder Abrechnung dann gleichmäßig auf die Leute verteilt (relativ zu deren zu bezahlendem Preis).
-
-# Aufgrund dieser Rechnung muss einer Abrechnung immer eine Bestellung folgen, bei der der Pfand zurückgegeben wird, um die Verluste in der Abrechnung berechnen zu können. Falls die folgende Bestellung noch nicht bezahlt wurde, kann daher auch die Abrechnung noch nicht vollständig berechnet werden.
-
 # Wir haben angefangen mit:
 #Konto: +140 (Kaution, 7*20)
 
