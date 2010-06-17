@@ -5,6 +5,8 @@ Sorry English readers, this is heavily German focused right now. Although it can
 In der Datei abrechnung.txt stehen sowohl alle Bestellungen als auch die Getränkeabrechnungen (wer viel viel getrunken hat).
 Die Datei wird von abrechnung.py eingelesen und verarbeitet. Dort wird dann ausgegeben, wer wie viel bezahlen muss, wie die Kasse gerade aussieht, etc.
 
+Der aktuelle Stand der Kasse ist i.d.R. negativ, da das System anfängliche Kaution oder ähnliches ignoriert. Das macht die ganze Rechnung deutlich einfacher und klarer.
+
 Der Verlust bei einer Abrechnung berechnet sich so:
    GeldInKasse ist i.d.R. negativ (Kaution ist nicht mitgerechnet).
    WertVonGetränken ist der Wert der noch vorhandenen Getränken (positiv).
