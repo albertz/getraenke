@@ -25,6 +25,12 @@ abrechnRE = re.compile("^" +
 	"(?P<type>[\w ]+): (?P<data>(\w+ [0-9]+, *)*\w+ [0-9]+)" +
 	" *$", re.UNICODE)
 
+class Err(Exception):
+	def __init__(self, txt):
+		self.txt = txt
+	def __str__(self):
+		# additional stuff for better readability
+		return "\n-------------------------------------------\n" + self.txt
 
 def iif(condition,resultiftrue,resultiffalse):
     if condition:return resultiftrue
@@ -58,7 +64,7 @@ class Stand:
 		self.dump("Bestellung (" + desc + ")")
 		
 	def handleAbrechnung(self, abr, letzteBest):
-		if self.rechnungNochOffen: raise NameError, "kann Abrechnung nicht machen, wenn noch eine Rechnung offen steht"
+		if self.rechnungNochOffen: raise Err, "kann Abrechnung nicht machen, wenn noch eine Rechnung offen steht"
 		self.geldInKasse += abr.summe
 		self.dump("Abrechnung (+" + geld(abr.summe).strip() + ")")
 		print "  mit Pfandrückgabe (" + geld(letzteBest.pfandRueckgabe).strip() + ") :", geld(self.geldInKasse + letzteBest.pfandRueckgabe), "(~= -Wert der noch vorhandenen Flaschen)"
@@ -107,7 +113,7 @@ class Bestellung:
 		if "Cola" in name: return "Cola"
 		if "Orange" in name: return "O"
 		if "Bitburger" in name: return "Bier"
-		raise NameError, "Getränk " + name + " unbekannt!"
+		raise Err, "Getränk " + name + " unbekannt!"
 
 	def handle(self, l):
 		m = getraenkeBezahltRE.match(l)
@@ -116,7 +122,7 @@ class Bestellung:
 			return
 			
 		m = getraenkRE.match(l)
-		if not m: raise NameError, "Error, I don't understand (context Bestellung): " + l
+		if not m: raise Err, "Error, I don't understand (context Bestellung): " + l
 		
 		Getraenk = m.group("Getraenk")
 		GetraenkTyp = self.getraenkTyp(Getraenk)
@@ -139,7 +145,7 @@ class Bestellung:
 
 		FlaschenPreis = KastenPreis / FlaschenAnzahl
 		if GetraenkTyp in self.preise and self.preise[GetraenkTyp] != FlaschenPreis:
-			raise NameError, "Getränktyp " + GetraenkTyp + " doppelt und Preis unterschiedlich"
+			raise Err, "Getränktyp " + GetraenkTyp + " doppelt und Preis unterschiedlich"
 		self.preise[GetraenkTyp] = FlaschenPreis
 		
 
@@ -155,7 +161,7 @@ class Abrechnung:
 		self.fehltGeldFlaschen = None
 	
 	def preFinalize(self):
-		if self.nochda == None: raise NameError, "'noch da' wurde nicht in Abrechnung vom " + self.date + " angegeben"
+		if self.nochda == None: raise Err, "'noch da' wurde nicht in Abrechnung vom " + self.date + " angegeben"
 
 		# Verluste durch fehlende Flaschen ausrechnen
 		#print "theoretisch noch da:", stand.getraenke, "; noch da:", self.nochda
@@ -192,7 +198,7 @@ class Abrechnung:
 		bezahlenInsg = sum(personen.itervalues())
 		print "  zu bezahlen:", geld(bezahlenInsg), "(insgesamt ohne Verluste gerechnet)"
 		print "  Stand:", geld(stand.geldInKasse + wertVonGetraenken(self.nochda)), "(Kasse + Wert von noch vorhandenen Getränken)"
-		if not letzteBest.pfandRueckgabe: raise NameError, "letzte Bestellung vom " + letzteBest.date + " wurde noch nicht bezahlt, daher noch unbekannt, wie viel Pfand wir zurückbekommen, daher kann fehlendes Geld nicht berechnet werden"
+		if not letzteBest.pfandRueckgabe: raise Err, "letzte Bestellung vom " + letzteBest.date + " wurde noch nicht bezahlt, daher noch unbekannt, wie viel Pfand wir zurückbekommen, daher kann fehlendes Geld nicht berechnet werden"
 		fehltGeld = - (stand.geldInKasse + wertVonGetraenken(self.nochda) + letzteBest.pfandRueckgabe + bezahlenInsg)
 		print "  fehlendes Geld:", geld(fehltGeld), "(Stand + zu bezahlen + letzte Pfandrückgabe)"
 		# in seltenen Fällen, wenn Pfand wiedergefunden wurde o.Ä., haben wir fehltGeld<0, also kriegen wir etwas wieder
@@ -213,30 +219,30 @@ class Abrechnung:
 	def parse(self, data):
 		getraenke = {}
 		for e in [ re.match("^(\w+) ([0-9]+)$", e).groups() for e in re.split(" *, *", data) ]:
-			if not e[0] in getraenkTypen: raise NameError, "Getränk Typ " + e[0] + " unbekannt in '" + data + "' von Abrechnung vom " + self.date
-			if e[0] in getraenke: raise NameError, "Getränk Typ " + e[0] + " doppelt in '" + data + "' von Abrechnung vom " + self.date
+			if not e[0] in getraenkTypen: raise Err, "Getränk Typ " + e[0] + " unbekannt in '" + data + "' von Abrechnung vom " + self.date
+			if e[0] in getraenke: raise Err, "Getränk Typ " + e[0] + " doppelt in '" + data + "' von Abrechnung vom " + self.date
 			getraenke[e[0]] = int(e[1])			
 		return getraenke
 	
 	def handle(self, l):
 		# muss extra behandelt werden weil es nicht ins Muster passt
 		if l.strip() == "noch da: -":
-			if self.nochda: raise NameError, "'noch da' wurde doppelt angegeben in Abrechnung " + self.date
+			if self.nochda: raise Err, "'noch da' wurde doppelt angegeben in Abrechnung " + self.date
 			self.nochda = dict()
 			return
 		
 		m = abrechnRE.match(l)
-		if not m: raise NameError, "Error, I don't understand (context Abrechnung): " + l
+		if not m: raise Err, "Error, I don't understand (context Abrechnung): " + l
 
 		Typ = m.group("type")
 		Getraenke = self.parse(m.group("data"))
 		
 		if Typ == "noch da":
-			if self.nochda: raise NameError, "'noch da' wurde doppelt angegeben in Abrechnung " + self.date
+			if self.nochda: raise Err, "'noch da' wurde doppelt angegeben in Abrechnung " + self.date
 			self.nochda = Getraenke
 
 		else:	
-			if Typ in self.personen: raise NameError, "Person " + Typ + " doppelt angegeben in Abrechnung vom " + self.date + " in Zeile '" + l + "', bisherige Daten: " + repr(self.personen)
+			if Typ in self.personen: raise Err, "Person " + Typ + " doppelt angegeben in Abrechnung vom " + self.date + " in Zeile '" + l + "', bisherige Daten: " + repr(self.personen)
 			self.personen[Typ] = Getraenke
 			for (g,count) in Getraenke.items():
 				stand.getraenke[g] -= count
@@ -260,19 +266,19 @@ for l in f.readlines():
 				letzteAbrechnung = None
 			else:
 				if bestellung.pfandRueckgabe:
-					raise NameError, "Bestellung von " + bestellung.date + " ohne vorherige Abrechnung, aber mit Pfandrückgabe " + geld(bestellung.pfandRueckgabe).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
+					raise Err, "Bestellung von " + bestellung.date + " ohne vorherige Abrechnung, aber mit Pfandrückgabe " + geld(bestellung.pfandRueckgabe).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
 					
 			stand.handleBestellung(bestellung)
 			letzteBestellung = bestellung
 			bestellung = None
 		elif abrechnung:
-			if letzteAbrechnung: raise NameError, "Keine Bestellung zwischen letzter (" + abrechnung.date + ") und vorletzter Abrechnung"
+			if letzteAbrechnung: raise Err, "Keine Bestellung zwischen letzter (" + abrechnung.date + ") und vorletzter Abrechnung"
 			abrechnung.preFinalize()
 			letzteAbrechnung = abrechnung
 			abrechnung = None
 			letzteBestellung = None
 		else:
-			raise NameError, "Error, '.' only allowed in context"
+			raise Err, "Error, '.' only allowed in context"
 		continue
 	
 	if bestellung:
@@ -293,5 +299,5 @@ for l in f.readlines():
 			letzteBestellung = None
 			continue
 
-		raise NameError, "Error, I don't understand (no context): " + l
+		raise Err, "Error, I don't understand (no context): " + l
 		
