@@ -258,7 +258,10 @@ for l in f.readlines():
 				letzteAbrechnung.finalize(bestellung)
 				stand.handleAbrechnung(letzteAbrechnung, bestellung)
 				letzteAbrechnung = None
-
+			else:
+				if bestellung.pfandRueckgabe:
+					raise NameError, "Bestellung von " + bestellung.date + " ohne vorherige Abrechnung, aber mit Pfandrückgabe " + geld(bestellung.pfandRueckgabe).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
+					
 			stand.handleBestellung(bestellung)
 			letzteBestellung = bestellung
 			bestellung = None
