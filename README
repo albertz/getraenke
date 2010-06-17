@@ -12,7 +12,7 @@ Der Verlust bei einer Abrechnung berechnet sich so:
    WertVonGetränken ist der Wert der noch vorhandenen Getränken (positiv).
    Abrechnungsbetrag ist das, was getrunken wurde, in Geld.
    Pfandrückgabe ist die Pfandrückgabe von der letzten Rechnung.
-   Differenz = Abrechnungsbetrag + GeldInKasse + WertVonGetränken + Pfandrückgabe
+   Differenz = Abrechnungsbetrag + GeldInKasse + WertVonGetränken + Pfandrückgabe - Trinkgeld
    Verlust = -Differenz
 Die Verlustberechnung ist nicht ganz exakt, aber vereinfacht die Abrechnung deutlich und versichert, dass in der Kasse niemals Schulden entstehen.
 Der Verlust wird bei jeder Abrechnung dann gleichmäßig auf die Leute verteilt (relativ zu deren zu bezahlendem Preis).

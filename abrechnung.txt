@@ -47,7 +47,7 @@ Bitburger 20x0,5: 1 * 12,79
 # Bestellung 26.3.2010 : 78.63 €  Pfand: 54.1 €  Summe: 132.73 €
 # Rechnung vom 12.4., bezahlt am 3.6.: 86.47€ = 78.63 + 54.1 - 46.26 (eigentlich 84.47€ wegen Ausgleich, siehe letzte Rechnung)
 # D.h. 46.26€ Pfand zurückbekommen
-Trinkgeld: 5
+Trinkgeld: 0
 bezahlt: 86.47
 .
 
