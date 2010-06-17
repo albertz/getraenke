@@ -1,0 +1,99 @@
+# Bestellnummer: 0240 571633
+
+# Pfandpreise: http://de.wikipedia.org/wiki/Flaschenpfand
+
+# In dieser Datei stehen sowohl alle Bestellungen als auch die Getränkeabrechnungen (wer viel viel getrunken hat).
+# Die Datei wird von abrechnung.py eingelesen und verarbeitet. Dort wird dann ausgegeben, wer wie viel bezahlen muss, wie die Kasse gerade aussieht, etc.
+
+# Der Verlust bei einer Abrechnung berechnet sich so:
+#   GeldInKasse ist i.d.R. negativ (Kaution ist nicht mitgerechnet).
+#   WertVonGetränken ist der Wert der noch vorhandenen Getränken (positiv).
+#   Abrechnungsbetrag ist das, was getrunken wurde, in Geld.
+#   Pfandrückgabe ist die Pfandrückgabe von der letzten Rechnung.
+#   Differenz = Abrechnungsbetrag + GeldInKasse + WertVonGetränken + Pfandrückgabe
+#   Verlust = -Differenz
+# Die Verlustberechnung ist nicht ganz exakt, aber vereinfacht die Abrechnung deutlich und versichert, dass in der Kasse niemals Schulden entstehen.
+# Der Verlust wird bei jeder Abrechnung dann gleichmäßig auf die Leute verteilt (relativ zu deren zu bezahlendem Preis).
+
+# Aufgrund dieser Rechnung muss einer Abrechnung immer eine Bestellung folgen, bei der der Pfand zurückgegeben wird, um die Verluste in der Abrechnung berechnen zu können. Falls die folgende Bestellung noch nicht bezahlt wurde, kann daher auch die Abrechnung noch nicht vollständig berechnet werden.
+
+# Wir haben angefangen mit:
+#Konto: +140 (Kaution, 7*20)
+
+Bestellung 19.2.2010:
+Granus Apfelschorle 12x0,7: 3 * 7,99
+Kastell 12x0,7: 4 * 1,99
+Kastell still 12x0,75: 5 * 1,99
+Coca Cola 12x1,0: 1 * 10,49
+Lindawier Orange 6x1,0: 3 * 6,99
+# das ist damit der Preis in der Abrechnung da ist
+Bitburger 20x0,5: 0 * 12,79
+# Trinkgeld nächstes mal mehr
+# gekommen: 22.2.10
+# Bestellung 19.2.2010 : 73.34 €  Pfand: 50.1 €  Summe: 123.44 €
+# bezahlt 73,34 + 50,1 = 123,44
+# (eigentlich 125,44 wegen Fehler von denen, aber ausgeglichen mit nächster Rechnung)
+bezahlt: 123.44
+.
+
+
+Abrechnung 28.3.2010:
+Patrick: Bier 12, Wasser 1, Cola 2, O 1
+Judith: Bier 2
+Kiki: Bier 12, Wasser 5, Cola 5
+Elena: Wasser 4, A 3, O 2
+# Radler: Elena 1, Bene 1, Patrick 14; Radler zählen aber nicht mehr
+# alles wurde Patrick gegeben
+Bene: Wasser 95, A 5
+Albert: A 27, O 4
+Yan: Wasser 1, A 1, O 4
+Sonja: Wasser 1, O 4
+# Die letzte Bestellung - nochda = alles was weg ist
+noch da: Wasser 1, Cola 4, O 3
+.
+
+
+Bestellung 26.3.2010:
+Kastell 12x0,7: 5 * 1,99
+Kastell still 12x0,75: 5 * 1,99
+Lindawier Orange 6x1,0: 2 * 6,99
+Granus Apfelschorle 12x0,7: 4 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+# Bestellung 26.3.2010 : 78.63 €  Pfand: 54.1 €  Summe: 132.73 €
+# Rechnung vom 12.4., bezahlt am 3.6.: 86.47€ = 78.63 + 54.1 - 46.26 (eigentlich 84.47€ wegen Ausgleich, siehe letzte Rechnung)
+# D.h. 46.26€ Pfand zurückbekommen
+bezahlt: 86.47
+.
+
+
+# Heimkonvent, was übrig ist, d.h. eigentlich ist es keine wirkliche "Bestellung" bzw. Benedikt hat uns das verkauft 
+Bestellung 23.4.2010:
+Kastell 12x0,7: 1 * 1,99
+Cola 12x1,0: 1 * 10,49
+Bitburger 20x0,3: 1 * 11,99
+# noch nicht bezahlt (Sonja aber Bescheid gesagt, geht dann über Etagenabrechnung -- sobald ok, kann ich dann als bezahlt markieren)
+.
+
+
+Abrechnung 16.6.2010:
+Patrick: Bier 22, Wasser 3, Cola 3, A 1
+Bene: Bier 1, Wasser 101, A 7, O 1
+Kiwi: Bier 9, Wasser 9, Cola 4
+Elena: Bier 4, Wasser 2, Cola 5, A 1, O 2
+Albert: Bier 2, Wasser 8, A 38, O 8
+Yan: Wasser 5, O 2
+Sonja: A 1
+Judits: Bier 2
+noch da: -
+.
+
+Bestellung 15.6.2010:
+Kastell 12x0,7: 5 * 1,99
+Kastell still 12x0,75: 5 * 1,99
+Becker Orange 6x1,0: 2 * 9,49
+Granus Apfelschorle 12x0,7: 4 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+# noch nicht angekommen
+# TODO: Trinkgeld noch einberechnen (von diesem Mal und letztem Mal (5€), davor nichts gegeben)
+.
+
