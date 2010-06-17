@@ -15,6 +15,7 @@ bestellungTitleRE = re.compile("^Bestellung +(?P<date>.*): *$", re.IGNORECASE)
 abrechnungTitleRE = re.compile("^Abrechnung +(?P<date>.*): *$", re.IGNORECASE)
 
 getraenkeBezahltRE = re.compile("^bezahlt: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
+getraenkeTrinkgeldRE = re.compile("^Trinkgeld: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
 
 getraenkRE = re.compile("^" +
 	"(?P<Getraenk>[\w ]+) (?P<FlaschenAnzahl>\d+)x(?P<FlaschenInhalt>[0-9,.]+): *" +
@@ -51,7 +52,7 @@ class Stand:
 
 	def handleBestellung(self, best):
 		if best.bezahlt:
-			self.geldInKasse -= best.bezahlt
+			self.geldInKasse -= best.bezahlt + best.trinkgeld
 			desc = "-" + geld(best.bezahlt).strip()
 		else:
 			self.rechnungNochOffen = True
@@ -67,7 +68,8 @@ class Stand:
 		if self.rechnungNochOffen: raise Err, "kann Abrechnung nicht machen, wenn noch eine Rechnung offen steht"
 		self.geldInKasse += abr.summe
 		self.dump("Abrechnung (+" + geld(abr.summe).strip() + ")")
-		print "  mit Pfandrückgabe (" + geld(letzteBest.pfandRueckgabe).strip() + ") :", geld(self.geldInKasse + letzteBest.pfandRueckgabe), "(~= -Wert der noch vorhandenen Flaschen)"
+		g = self.geldInKasse + letzteBest.pfandRueckgabe - letzteBest.trinkgeld
+		print "  mit Pfandrückgabe (+" + geld(letzteBest.pfandRueckgabe).strip() + ") und Trinkgeld(-" + geld(letzteBest.trinkgeld).strip() + ") :", geld(g), "(~= -Wert der noch vorhandenen Flaschen)"
 		
 	def dump(self, desc):
 		print "Geld in Kasse nach", desc, ":", geld(self.geldInKasse), " noch eine Rechnung offen" if self.rechnungNochOffen else ""
@@ -93,6 +95,7 @@ class Bestellung:
 		self.betrag = 0
 		self.pfand = 0
 		self.bezahlt = None
+		self.trinkgeld = None
 		self.pfandRueckgabe = None
 
 	def finalize(self):
@@ -102,8 +105,9 @@ class Bestellung:
 			" Pfand:", self.pfand, "€", \
 			" Summe:", self.betrag + self.pfand, "€"
 		if self.bezahlt:
+			if self.trinkgeld == None: raise Err, "Trinkgeld wurde in Bestellung vom " + self.date + " nicht angegeben"
 			self.pfandRueckgabe = self.betrag + self.pfand - self.bezahlt
-			print "  bezahlt:", self.bezahlt, "€", " Differenz (Pfandrückgabe):", self.pfandRueckgabe, "€"
+			print "  bezahlt:", geld(self.bezahlt).strip(), " Differenz (Pfandrückgabe):", geld(self.pfandRueckgabe).strip(), " Trinkgeld:", geld(self.trinkgeld).strip()
 		else:
 			print "  noch nicht bezahlt"
 		
@@ -116,6 +120,11 @@ class Bestellung:
 		raise Err, "Getränk " + name + " unbekannt!"
 
 	def handle(self, l):
+		m = getraenkeTrinkgeldRE.match(l)
+		if m:
+			self.trinkgeld = float(m.group("Betrag").replace(",","."))
+			return
+
 		m = getraenkeBezahltRE.match(l)
 		if m:
 			self.bezahlt = float(m.group("Betrag").replace(",","."))
@@ -199,8 +208,8 @@ class Abrechnung:
 		print "  zu bezahlen:", geld(bezahlenInsg), "(insgesamt ohne Verluste gerechnet)"
 		print "  Stand:", geld(stand.geldInKasse + wertVonGetraenken(self.nochda)), "(Kasse + Wert von noch vorhandenen Getränken)"
 		if not letzteBest.pfandRueckgabe: raise Err, "letzte Bestellung vom " + letzteBest.date + " wurde noch nicht bezahlt, daher noch unbekannt, wie viel Pfand wir zurückbekommen, daher kann fehlendes Geld nicht berechnet werden"
-		fehltGeld = - (stand.geldInKasse + wertVonGetraenken(self.nochda) + letzteBest.pfandRueckgabe + bezahlenInsg)
-		print "  fehlendes Geld:", geld(fehltGeld), "(Stand + zu bezahlen + letzte Pfandrückgabe)"
+		fehltGeld = - (stand.geldInKasse + wertVonGetraenken(self.nochda) + letzteBest.pfandRueckgabe - letzteBest.trinkgeld + bezahlenInsg)
+		print "  fehlendes Geld:", geld(fehltGeld), "(Stand + zu bezahlen + letzte Pfandrückgabe - Trinkgeld)"
 		# in seltenen Fällen, wenn Pfand wiedergefunden wurde o.Ä., haben wir fehltGeld<0, also kriegen wir etwas wieder
 		# bei unserer allerersten Abrechnung ist es sogar noch mehr, weil eine ganze Menge Bier da berechnet wurde, die aber noch übrig war von früher
 				
