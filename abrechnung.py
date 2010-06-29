@@ -9,8 +9,6 @@ import math
 dir = os.path.dirname(sys.argv[0])
 f = open(dir + "/abrechnung.txt")
 
-konto = 0
-
 bestellungTitleRE = re.compile("^Bestellung +(?P<date>.*): *$", re.IGNORECASE)
 abrechnungTitleRE = re.compile("^Abrechnung +(?P<date>.*): *$", re.IGNORECASE)
 
@@ -33,10 +31,6 @@ class Err(Exception):
 		# additional stuff for better readability
 		return "\n-------------------------------------------\n" + self.txt
 
-def iif(condition,resultiftrue,resultiffalse):
-    if condition:return resultiftrue
-    else: return resultiffalse
-    
 def geld(v):
 	return str(round(v,2)) + " €"
 
