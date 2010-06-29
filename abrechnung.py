@@ -44,7 +44,7 @@ getraenkTypen = set([ "A", "Wasser", "Cola", "O", "Bier" ])
 
 class Stand:
 	def __init__(self):
-		self.rechnungNochOffen = False
+		self.rechnungNochOffen = None
 		self.geldInKasse = 0.0
 		self.getraenkePreise = {}
 		self.getraenke = {}
@@ -55,7 +55,7 @@ class Stand:
 			self.geldInKasse -= best.bezahlt + best.trinkgeld
 			desc = "-" + geld(best.bezahlt).strip()
 		else:
-			self.rechnungNochOffen = True
+			self.rechnungNochOffen = best
 			desc = "offen"
 
 		for g in getraenkTypen:
@@ -65,7 +65,7 @@ class Stand:
 		self.dump("Bestellung (" + desc + ")")
 		
 	def handleAbrechnung(self, abr, letzteBest):
-		if self.rechnungNochOffen: raise Err, "kann Abrechnung nicht machen, wenn noch eine Rechnung offen steht"
+		if self.rechnungNochOffen: raise Err, "kann Abrechnung nicht machen, wenn noch eine Rechnung offen steht; offen stehende Rechnung vom " + self.rechnungNochOffen.date
 		self.geldInKasse += abr.summe
 		self.dump("Abrechnung (+" + geld(abr.summe).strip() + ")")
 		g = self.geldInKasse + letzteBest.pfandRueckgabe - letzteBest.trinkgeld
