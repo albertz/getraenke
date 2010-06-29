@@ -57,7 +57,8 @@ Bestellung 23.4.2010:
 Kastell 12x0,7: 1 * 1,99
 Cola 12x1,0: 1 * 10,49
 Bitburger 20x0,3: 1 * 11,99
-# noch nicht bezahlt (Sonja aber Bescheid gesagt, geht dann über Etagenabrechnung -- sobald ok, kann ich dann als bezahlt markieren)
+# Sonja Bescheid gesagt, geht dann über Etagenabrechnung -- sobald ok, kann ich dann als bezahlt markieren
+bezahlt: 34,17
 # Bene kriegt nix von uns :)
 Trinkgeld: 0
 .
@@ -66,7 +67,7 @@ Trinkgeld: 0
 Abrechnung 16.6.2010:
 Patrick: Bier 22, Wasser 3, Cola 3, A 1
 Bene: Bier 1, Wasser 101, A 7, O 1
-Kiwi: Bier 9, Wasser 9, Cola 4
+Kiki: Bier 9, Wasser 9, Cola 4
 Elena: Bier 4, Wasser 2, Cola 5, A 1, O 2
 Albert: Bier 2, Wasser 8, A 38, O 8
 Yan: Wasser 5, O 2
@@ -81,7 +82,10 @@ Kastell still 12x0,75: 5 * 1,99
 Becker Orange 6x1,0: 2 * 9,49
 Granus Apfelschorle 12x0,7: 4 * 7,99
 Bitburger 20x0,5: 1 * 12,79
-# noch nicht angekommen
-# TODO: Trinkgeld noch einberechnen (von diesem Mal und letztem Mal (5€), davor nichts gegeben)
+# gekommen 17.6.
+# bezahlt 29.6.
+bezahlt: 58,99
+# Trinkgeld diesmal 2, von letztem Mal 5
+Trinkgeld: 7
 .
 
