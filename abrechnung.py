@@ -134,6 +134,7 @@ class Bestellung:
 		GetraenkTyp = self.getraenkTyp(Getraenk)
 		KastenPfand = 1.5
 		FlaschenPfand = 0.15
+		if Getraenk == "Kastell Apfelschorle": FlaschenPfand = 0.25 # sind PET flaschen
 		if GetraenkTyp == "Bier": FlaschenPfand = 0.08
 
 		KastenAnzahl = int(m.group("KaestenAnzahl"))
