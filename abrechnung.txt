@@ -88,5 +88,16 @@ Yan: Wasser 5, O 2
 Sonja: A 1
 Judits: Bier 2
 noch da: -
+# warte noch auf Sonjas Abrechnung
+.
+
+
+Bestellung 19.7.2010:
+Kastell 12x0,7: 5 * 1,99
+Kastell still 12x0,75: 5 * 1,99
+Becker Orange 6x1,0: 1 * 9,49
+Kastell Apfelschorle 12x1,0: 3 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+Coca Cola 12x1,0: 1 * 10,99
 .
 
