@@ -93,6 +93,9 @@ class Bestellung:
 		self.pfandRueckgabe = None
 
 	def finalize(self):
+		for getraenkTyp in self.getraenke:
+			stand.getraenke[getraenkTyp] += self.getraenke[getraenkTyp]
+
 		print \
 			"Bestellung", self.date, ":", \
 			self.betrag, "€", \
@@ -144,7 +147,6 @@ class Bestellung:
 		self.pfand += pfandkasten + pfandflaschen
 
 		self.getraenke[GetraenkTyp] += FlaschenAnzahl * KastenAnzahl
-		stand.getraenke[GetraenkTyp] += FlaschenAnzahl * KastenAnzahl
 
 		FlaschenPreis = KastenPreis / FlaschenAnzahl
 		if GetraenkTyp in self.preise and self.preise[GetraenkTyp] != FlaschenPreis:
@@ -152,8 +154,6 @@ class Bestellung:
 		self.preise[GetraenkTyp] = FlaschenPreis
 		
 
-bestellung = None
-letzteBestellung = None
 
 class Abrechnung:
 	def __init__(self, date):
@@ -251,8 +251,9 @@ class Abrechnung:
 				stand.getraenke[g] -= count
 
 
+bestellung = None
+letzteBestellung = None
 abrechnung = None
-letzteAbrechnung = None
 
 
 for l in f.readlines():
@@ -261,27 +262,31 @@ for l in f.readlines():
 	if len(l) == 0: continue
 	if l == ".":
 		if bestellung:
-			bestellung.finalize()
-			
-			if letzteAbrechnung:
-				letzteAbrechnung.finalize(bestellung)
-				stand.handleAbrechnung(letzteAbrechnung, bestellung)
-				letzteAbrechnung = None
-			else:
-				if bestellung.pfandRueckgabe:
-					raise Err, "Bestellung von " + bestellung.date + " ohne vorherige Abrechnung, aber mit Pfandrückgabe " + geld(bestellung.pfandRueckgabe).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
-					
-			stand.handleBestellung(bestellung)
+			if letzteBestellung:
+				if letzteBestellung.pfandRueckgabe:
+					raise Err, "Bestellung von " + letzteBestellung.date + " ohne vorherige Abrechnung, aber mit Pfandrückgabe " + geld(letzteBestellung.pfandRueckgabe).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
+				if letzteBestellung.trinkgeld:
+					raise Err, "Bestellung von " + letzteBestellung.date + " ohne vorherige Abrechnung, aber mit Trinkgeld " + geld(letzteBestellung.trinkgeld).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
+				letzteBestellung.finalize()	
+				stand.handleBestellung(letzteBestellung)
+				letzteBestellung = None
+				
 			letzteBestellung = bestellung
 			bestellung = None
+			
 		elif abrechnung:
-			if letzteAbrechnung: raise Err, "Keine Bestellung zwischen letzter (" + abrechnung.date + ") und vorletzter Abrechnung"
+			if not letzteBestellung: raise Err, "Keine Bestellung zwischen letzter (" + abrechnung.date + ") und vorletzter Abrechnung"
+
 			abrechnung.preFinalize()
-			letzteAbrechnung = abrechnung
-			abrechnung = None
+			letzteBestellung.finalize()	
+			abrechnung.finalize(letzteBestellung)
+			stand.handleAbrechnung(abrechnung, letzteBestellung)
+			stand.handleBestellung(letzteBestellung)
 			letzteBestellung = None
+			abrechnung = None
 		else:
-			raise Err, "Error, '.' only allowed in context"
+			raise Err, "Error, '.' only allowed in context (Abrechnung oder Bestellung)"
+			
 		continue
 	
 	if bestellung:
@@ -299,7 +304,6 @@ for l in f.readlines():
 		a = abrechnungTitleRE.match(l)
 		if a:
 			abrechnung = Abrechnung(a.group("date"))
-			letzteBestellung = None
 			continue
 
 		raise Err, "Error, I don't understand (no context): " + l
