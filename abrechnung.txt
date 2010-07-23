@@ -99,5 +99,17 @@ Becker Orange 6x1,0: 1 * 9,49
 Kastell Apfelschorle 12x1,0: 3 * 7,99
 Bitburger 20x0,5: 1 * 12,79
 Coca Cola 12x1,0: 1 * 10,99
+# gekommen, noch nicht bezahlt
 .
 
+
+Abrechnung 24.7.2010:
+Patrick: Bier 9, Wasser 1, A 2, O 1
+Bene: Wasser 122, A 7, O 1
+Kirsten: Bier 2, Wasser 2
+Elena: Wasser 9, A 6, O 2
+Yan: Wasser 9, A 2, O 1
+Sonja: A 1, O 1
+Albert: A 18, O 3
+noch da: Bier 9, A 12, O 3
+.
