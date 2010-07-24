@@ -105,7 +105,7 @@ Coca Cola 12x1,0: 1 * 10,99
 
 Abrechnung 24.7.2010:
 Patrick: Bier 9, Wasser 1, A 2, O 1
-Bene: Wasser 122, A 7, O 1
+Bene: Wasser 98, A 7, O 1
 Kirsten: Bier 2, Wasser 2
 Elena: Wasser 9, A 6, O 2
 Yan: Wasser 9, A 2, O 1
