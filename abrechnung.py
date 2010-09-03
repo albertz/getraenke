@@ -204,7 +204,7 @@ class Abrechnung:
 		print "  Stand:", geld(stand.geldInKasse + wertVonGetraenken(self.nochda)), "(Kasse + Wert von noch vorhandenen Getränken)"
 		if not letzteBest.pfandRueckgabe: raise Err, "letzte Bestellung vom " + letzteBest.date + " wurde noch nicht bezahlt, daher noch unbekannt, wie viel Pfand wir zurückbekommen, daher kann fehlendes Geld nicht berechnet werden"
 		fehltGeld = - (stand.geldInKasse + wertVonGetraenken(self.nochda) + letzteBest.pfandRueckgabe - letzteBest.trinkgeld + bezahlenInsg)
-		print "  fehlendes Geld:", geld(fehltGeld), "(Stand + zu bezahlen + letzte Pfandrückgabe - Trinkgeld)"
+		print "  fehlendes Geld:", geld(fehltGeld), "(-Stand - zu bezahlen - letzte Pfandrückgabe + Trinkgeld)"
 		# in seltenen Fällen, wenn Pfand wiedergefunden wurde o.Ä., haben wir fehltGeld<0, also kriegen wir etwas wieder
 		# bei unserer allerersten Abrechnung ist es sogar noch mehr, weil eine ganze Menge Bier da berechnet wurde, die aber noch übrig war von früher
 				
