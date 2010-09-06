@@ -102,6 +102,7 @@ Coca Cola 12x1,0: 1 * 10,99
 # gekommen
 # Rechnung sagt 93,74. wegen Unklarheiten bei Pfand -3,30, also:
 bezahlt: 90,44
+# am 3.9. bezahlt
 Trinkgeld: 2
 .
 
@@ -123,4 +124,6 @@ Kastell 12x0,7: 6 * 1,99
 Kastell still 12x0,75: 6 * 1,99
 Becker Orange 6x1,0: 1 * 9,49
 Granus Apfelschorle 12x0,7: 2 * 7,99
+# gekommen 6.9.
+Trinkgeld: 1
 .
