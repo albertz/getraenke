@@ -266,9 +266,9 @@ for l in f.readlines():
 			if letzteBestellung:
 				letzteBestellung.finalize()	
 				if letzteBestellung.pfandRueckgabe:
-					raise Err, "Bestellung von " + letzteBestellung.date + " ohne vorherige Abrechnung, aber mit Pfandrückgabe " + geld(letzteBestellung.pfandRueckgabe).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
+					raise Err, "Bestellung von " + letzteBestellung.date + " ohne nachfolgende Abrechnung, aber mit Pfandrückgabe " + geld(letzteBestellung.pfandRueckgabe).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
 				if letzteBestellung.trinkgeld:
-					raise Err, "Bestellung von " + letzteBestellung.date + " ohne vorherige Abrechnung, aber mit Trinkgeld " + geld(letzteBestellung.trinkgeld).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
+					raise Err, "Bestellung von " + letzteBestellung.date + " ohne nachfolgende Abrechnung, aber mit Trinkgeld " + geld(letzteBestellung.trinkgeld).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
 				stand.handleBestellung(letzteBestellung)
 				letzteBestellung = None
 				
