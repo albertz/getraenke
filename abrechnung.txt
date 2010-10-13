@@ -126,4 +126,17 @@ Becker Orange 6x1,0: 1 * 9,49
 Granus Apfelschorle 12x0,7: 2 * 7,99
 # gekommen 6.9.
 Trinkgeld: 1
+bezahlt: 49,55
+.
+
+# Zettel eigentlich schon älter, aber kam nicht dazu…
+Abrechnung 13.10.2010:
+Patrick: A 2, Wasser 1, Bier 2
+Kirsten: Bier 4, Cola 3
+Bene: A 2, Wasser 90
+Elena: Wasser 4
+Yan: Wasser 5
+Sonja: O 1
+Albert: A 15, Wasser 2, O 3, Bier 2
+noch da: A 27, O 5, Bier 22, Cola 11
 .
