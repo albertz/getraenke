@@ -150,4 +150,7 @@ Becker Orange 6x1,0: 1 * 9,49
 Granus Apfelschorle 12x0,7: 4 * 7,99
 Bitburger 20x0,5: 1 * 12,79
 Coca Cola 12x1,0: 1 * 10,99
+# gekommen am 15.11.
+Trinkgeld: 1
+# Pfand: 14 Kästen - X Flaschen (auf Zettel notiert)
 .
