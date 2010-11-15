@@ -129,6 +129,7 @@ Trinkgeld: 1
 bezahlt: 49,55
 .
 
+
 # Zettel eigentlich schon älter, aber kam nicht dazu…
 Abrechnung 13.10.2010:
 Patrick: A 2, Wasser 1, Bier 2
@@ -139,4 +140,14 @@ Yan: Wasser 5
 Sonja: O 1
 Albert: A 15, Wasser 2, O 3, Bier 2
 noch da: A 27, O 5, Bier 22, Cola 11
+.
+
+
+Bestellung 9.11.2010:
+Kastell 12x0,7: 6 * 1,99
+Kastell still 12x0,75: 6 * 1,99
+Becker Orange 6x1,0: 1 * 9,49
+Granus Apfelschorle 12x0,7: 4 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+Coca Cola 12x1,0: 1 * 10,99
 .
