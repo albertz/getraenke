@@ -20,6 +20,17 @@ getraenkRE = re.compile("^" +
 	"(?P<KaestenAnzahl>[0-9,.]+) *\* *(?P<KastenPreis>[0-9,.]+)" +
 	" *$", re.UNICODE)
 
+einkaufEinzelnRE = re.compile("^einzeln: +" +
+	"(?P<Getraenk>[\w ]+): +" +
+	"(?P<FlaschenAnzahl>[0-9,.]+) *\* *(?P<FlaschenPreis>[0-9,.]+)" +
+	" *$", re.UNICODE)
+
+leergutRE = re.compile("^Leergut: +" +
+	"(?P<Getraenk>[\w ]+): +" +
+	"(?P<KaestenAnzahl>[0-9,.]+) *\* *" +
+	"(?P<FlaschenAnzahl>\d+)x(?P<FlaschenInhalt>[0-9,.]+) +Kasten" +
+	" *$", re.UNICODE)
+
 abrechnRE = re.compile("^" +
 	"(?P<type>[\w ]+): (?P<data>(\w+ [0-9]+, *)*\w+ [0-9]+)" +
 	" *$", re.UNICODE)
@@ -126,34 +137,62 @@ class Bestellung:
 		if m:
 			self.bezahlt = float(m.group("Betrag").replace(",","."))
 			return
-			
-		m = getraenkRE.match(l)
-		if not m: raise Err, "Error, I don't understand (context Bestellung): " + l
+		
+		m1 = einkaufEinzelnRE.match(l)
+		m2 = leergutRE.match(l)
+		m3 = getraenkRE.match(l)
+		m = m1 or m2 or m3
+		if not m:
+			raise Err, "Error, I don't understand (context Bestellung): " + l
 		
 		Getraenk = m.group("Getraenk")
+		
 		GetraenkTyp = self.getraenkTyp(Getraenk)
+		# WARNING: Wenn das jemals geändert wird, muss sehr aufgepasst werden,
+		# dass bisherige Abrechnungen sich nicht ändern. Also am besten
+		# einen Datumscheck.
 		KastenPfand = 1.5
 		FlaschenPfand = 0.15
 		if Getraenk == "Kastell Apfelschorle": FlaschenPfand = 0.25 # sind PET flaschen
 		if GetraenkTyp == "Bier": FlaschenPfand = 0.08
 
-		KastenAnzahl = int(m.group("KaestenAnzahl"))
-		KastenPreis = float(m.group("KastenPreis").replace(",","."))
-		FlaschenAnzahl = int(m.group("FlaschenAnzahl"))
-		
-		betrag = KastenAnzahl * KastenPreis
-		pfandkasten = KastenAnzahl * KastenPfand
-		pfandflaschen = KastenAnzahl * FlaschenAnzahl * FlaschenPfand
-		self.betrag += betrag
-		self.pfand += pfandkasten + pfandflaschen
+		if m1: # einzeln
+			FlaschenAnzahl = int(m.group("FlaschenAnzahl"))
+			FlaschenPreis = float(m.group("FlaschenPreis").replace(",","."))
+			betrag = FlaschenAnzahl * FlaschenPreis
+			pfand = FlaschenAnzahl * FlaschenPfand
+			
+			self.betrag += betrag
+			self.pfand += pfand
+			self.getraenke[GetraenkTyp] += FlaschenAnzahl
 
-		self.getraenke[GetraenkTyp] += FlaschenAnzahl * KastenAnzahl
+		elif m2: # Leergut
+			KastenAnzahl = int(m.group("KaestenAnzahl"))
+			FlaschenAnzahl = int(m.group("FlaschenAnzahl")) # obwohl nicht gebraucht im Mom. aber macht vielleicht was für den Kastenpfand aus
+			pfandkasten = KastenAnzahl * KastenPfand
+			
+			self.pfand += pfandkasten
 
-		FlaschenPreis = KastenPreis / FlaschenAnzahl
-		if GetraenkTyp in self.preise and self.preise[GetraenkTyp] != FlaschenPreis:
-			raise Err, "Getränktyp " + GetraenkTyp + " doppelt und Preis unterschiedlich"
-		self.preise[GetraenkTyp] = FlaschenPreis
-		
+		elif m3: # normal
+			KastenAnzahl = int(m.group("KaestenAnzahl"))
+			KastenPreis = float(m.group("KastenPreis").replace(",","."))
+			FlaschenAnzahl = int(m.group("FlaschenAnzahl"))
+			
+			betrag = KastenAnzahl * KastenPreis
+			pfandkasten = KastenAnzahl * KastenPfand
+			pfandflaschen = KastenAnzahl * FlaschenAnzahl * FlaschenPfand
+			self.betrag += betrag
+			self.pfand += pfandkasten + pfandflaschen
+
+			self.getraenke[GetraenkTyp] += FlaschenAnzahl * KastenAnzahl
+
+			FlaschenPreis = KastenPreis / FlaschenAnzahl
+
+		if not m2: # not Leergut
+			if GetraenkTyp in self.preise and self.preise[GetraenkTyp] != FlaschenPreis:
+				raise Err, "Getränktyp " + GetraenkTyp + " doppelt und Preis unterschiedlich"
+			self.preise[GetraenkTyp] = FlaschenPreis
+			
 
 
 class Abrechnung:
