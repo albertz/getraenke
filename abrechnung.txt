@@ -143,6 +143,16 @@ noch da: A 27, O 5, Bier 22, Cola 11
 .
 
 
+# Von Benedikt mal wieder…
+# Datum stimmt vermutlich nicht ganz…
+Bestellung 8.11.2010:
+einzeln: Coca Cola: 9 * 0,91
+Leergut: Coca Cola: 1 * 12x1,0 Kasten
+bezahlt: 11.04
+Trinkgeld: 0
+.
+
+
 Bestellung 9.11.2010:
 Kastell 12x0,7: 6 * 1,99
 Kastell still 12x0,75: 6 * 1,99
