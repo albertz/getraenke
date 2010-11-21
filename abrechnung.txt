@@ -154,3 +154,15 @@ Coca Cola 12x1,0: 1 * 10,99
 Trinkgeld: 1
 # Pfand: 14 Kästen - X Flaschen (auf Zettel notiert)
 .
+
+
+Abrechnung 21.11.2010:
+Patrick: A 1, Bier 14
+Bene: A 1, Wasser 124, Cola 2
+Maria: A 1, Wasser 4
+Yan: Wasser 6, O 3
+Tobi: Wasser 1, O 1, Bier 4
+Albert: A 29, Wasser 2, O 1, Bier 3, Cola 1
+Chris: A 17, Wasser 8, O 3, Cola 4
+noch da: Cola 6, O 2
+.
