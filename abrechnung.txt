@@ -163,6 +163,7 @@ Coca Cola 12x1,0: 1 * 10,99
 # gekommen am 15.11.
 Trinkgeld: 1
 # Pfand: 14 Kästen - X Flaschen (auf Zettel notiert)
+bezahlt: 105,31
 .
 
 
