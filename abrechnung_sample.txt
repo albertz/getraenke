@@ -1,0 +1,193 @@
+# Bestellnummer: 0240 571633
+
+# Wir haben angefangen mit:
+#Konto: +140 (Kaution, 7*20)
+
+Bestellung 19.2.2010:
+Granus Apfelschorle 12x0,7: 3 * 7,99
+Kastell 12x0,7: 4 * 1,99
+Kastell still 12x0,75: 5 * 1,99
+Coca Cola 12x1,0: 1 * 10,49
+Lindawier Orange 6x1,0: 3 * 6,99
+# das ist damit der Preis in der Abrechnung da ist
+Bitburger 20x0,5: 0 * 12,79
+# Trinkgeld nächstes mal mehr
+# gekommen: 22.2.10
+# Bestellung 19.2.2010 : 73.34 €  Pfand: 50.1 €  Summe: 123.44 €
+# bezahlt 73,34 + 50,1 = 123,44
+# (eigentlich 125,44 wegen Fehler von denen, aber ausgeglichen mit nächster Rechnung)
+Trinkgeld: 0
+# Bezahlt ist unabhängig von Trinkgeld
+bezahlt: 123.44
+.
+
+
+
+Bestellung 26.3.2010:
+Kastell 12x0,7: 5 * 1,99
+Kastell still 12x0,75: 5 * 1,99
+Lindawier Orange 6x1,0: 2 * 6,99
+Granus Apfelschorle 12x0,7: 4 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+# Bestellung 26.3.2010 : 78.63 €  Pfand: 54.1 €  Summe: 132.73 €
+# Rechnung vom 12.4., bezahlt am 3.6.: 86.47€ = 78.63 + 54.1 - 46.26 (eigentlich 84.47€ wegen Ausgleich, siehe letzte Rechnung)
+# D.h. 46.26€ Pfand zurückbekommen
+Trinkgeld: 0
+bezahlt: 86.47
+.
+
+Abrechnung 28.3.2010:
+Patrick: Bier 12, Wasser 1, Cola 2, O 1
+Judith: Bier 2
+Kiki: Bier 12, Wasser 5, Cola 5
+Elena: Wasser 4, A 3, O 2
+# Radler: Elena 1, Bene 1, Patrick 14; Radler zählen aber nicht mehr
+# alles wurde Patrick gegeben
+Bene: Wasser 95, A 5
+Albert: A 27, O 4
+Yan: Wasser 1, A 1, O 4
+Sonja: Wasser 1, O 4
+# Die letzte Bestellung - nochda = alles was weg ist
+noch da: Wasser 1, Cola 4, O 3
+.
+
+
+# Heimkonvent, was übrig ist, d.h. eigentlich ist es keine wirkliche "Bestellung" bzw. Benedikt hat uns das verkauft 
+Bestellung 23.4.2010:
+Kastell 12x0,7: 1 * 1,99
+Cola 12x1,0: 1 * 10,49
+Bitburger 20x0,3: 1 * 11,99
+# Sonja Bescheid gesagt, geht dann über Etagenabrechnung -- sobald ok, kann ich dann als bezahlt markieren
+bezahlt: 34,17
+# Bene kriegt nix von uns :)
+Trinkgeld: 0
+.
+
+
+Bestellung 15.6.2010:
+Kastell 12x0,7: 5 * 1,99
+Kastell still 12x0,75: 5 * 1,99
+Becker Orange 6x1,0: 2 * 9,49
+Granus Apfelschorle 12x0,7: 4 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+# gekommen 17.6.
+# bezahlt 29.6.
+bezahlt: 58,99
+# Trinkgeld diesmal 2, von letztem Mal 5
+Trinkgeld: 7
+.
+
+
+Abrechnung 16.6.2010:
+Patrick: Bier 22, Wasser 3, Cola 3, A 1
+Bene: Bier 1, Wasser 101, A 7, O 1
+Kiki: Bier 9, Wasser 9, Cola 4
+Elena: Bier 4, Wasser 2, Cola 5, A 1, O 2
+Albert: Bier 2, Wasser 8, A 38, O 8
+Yan: Wasser 5, O 2
+Sonja: A 1
+Judits: Bier 2
+noch da: -
+# warte noch auf Sonjas Abrechnung
+.
+
+
+Bestellung 19.7.2010:
+Kastell 12x0,7: 5 * 1,99
+Kastell still 12x0,75: 5 * 1,99
+Becker Orange 6x1,0: 1 * 9,49
+Kastell Apfelschorle 12x1,0: 3 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+Coca Cola 12x1,0: 1 * 10,99
+# gekommen
+# Rechnung sagt 93,74. wegen Unklarheiten bei Pfand -3,30, also:
+bezahlt: 90,44
+# am 3.9. bezahlt
+Trinkgeld: 2
+.
+
+
+Abrechnung 24.7.2010:
+Patrick: Bier 9, Wasser 1, A 2, O 1
+Bene: Wasser 98, A 7, O 1
+Kirsten: Bier 2, Wasser 2
+Elena: Wasser 9, A 6, O 2
+Yan: Wasser 9, A 2, O 1
+Sonja: A 1, O 1
+Albert: A 18, O 3
+noch da: Bier 9, A 12, O 3
+.
+
+
+Bestellung 3.9.2010:
+Kastell 12x0,7: 6 * 1,99
+Kastell still 12x0,75: 6 * 1,99
+Becker Orange 6x1,0: 1 * 9,49
+Granus Apfelschorle 12x0,7: 2 * 7,99
+# gekommen 6.9.
+Trinkgeld: 1
+bezahlt: 49,55
+.
+
+
+# Zettel eigentlich schon älter, aber kam nicht dazu…
+Abrechnung 13.10.2010:
+Patrick: A 2, Wasser 1, Bier 2
+Kirsten: Bier 4, Cola 3
+Bene: A 2, Wasser 90
+Elena: Wasser 4
+Yan: Wasser 5
+Sonja: O 1
+Albert: A 15, Wasser 2, O 3, Bier 2
+noch da: A 27, O 5, Bier 22, Cola 11
+.
+
+
+# Von Benedikt mal wieder…
+# Datum stimmt vermutlich nicht ganz…
+Bestellung 8.11.2010:
+einzeln: Coca Cola: 9 * 0,91
+Leergut: Coca Cola: 1 * 12x1,0 Kasten
+bezahlt: 11.04
+Trinkgeld: 0
+.
+
+
+Bestellung 9.11.2010:
+Kastell 12x0,7: 6 * 1,99
+Kastell still 12x0,75: 6 * 1,99
+Becker Orange 6x1,0: 1 * 9,49
+Granus Apfelschorle 12x0,7: 4 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+Coca Cola 12x1,0: 1 * 10,99
+# gekommen am 15.11.
+Trinkgeld: 1
+# Pfand: 14 Kästen - X Flaschen (auf Zettel notiert)
+bezahlt: 105,31
+.
+
+
+Abrechnung 21.11.2010:
+Patrick: A 1, Bier 14
+Bene: A 1, Wasser 124, Cola 2
+Maria: A 1, Wasser 4
+Yan: Wasser 6, O 3
+Tobi: Wasser 1, O 1, Bier 4
+Albert: A 29, Wasser 2, O 1, Bier 3, Cola 1
+Chris: A 17, Wasser 8, O 3, Cola 4
+noch da: Cola 6, O 2
+.
+
+
+
+Bestellung 3.2.2011:
+Wasser 12x0,7: 5 * 2,49
+Wasser still 12x0,75: 5 * 2,49
+Becker Orange 6x1,0: 1 * 9,49
+Granus Apfelschorle 12x0,7: 5 * 7,99
+Bitburger 20x0,5: 1 * 12,79
+Coca Cola 12x1,0: 1 * 10,99
+# gekommen am 7.2.
+# Trinkgeld mehr, da kein Kleingeld
+Trinkgeld: 5
+.
