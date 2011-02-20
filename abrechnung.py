@@ -122,6 +122,7 @@ class Bestellung:
 	def getraenkTyp(self, name):
 		if "Apfelschorle" in name: return "A"
 		if "Kastell" in name: return "Wasser"
+		if "Wasser" in name: return "Wasser"
 		if "Cola" in name: return "Cola"
 		if "Orange" in name: return "O"
 		if "Bitburger" in name: return "Bier"
