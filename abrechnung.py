@@ -58,7 +58,7 @@ class Stand:
 	def handleBestellung(self, best):
 		if best.bezahlt:
 			self.geldInKasse -= best.bezahlt + best.trinkgeld
-			desc = "-" + geld(best.bezahlt).strip()
+			desc = "-" + geld(best.bezahlt)
 		else:
 			self.rechnungNochOffen = best
 			desc = "offen"
@@ -72,9 +72,9 @@ class Stand:
 	def handleAbrechnung(self, abr, letzteBest):
 		if self.rechnungNochOffen: raise Err, "kann Abrechnung nicht machen, wenn noch eine Rechnung offen steht; offen stehende Rechnung vom " + self.rechnungNochOffen.date
 		self.geldInKasse += abr.summe
-		self.dump("Abrechnung (+" + geld(abr.summe).strip() + ")")
+		self.dump("Abrechnung (+" + geld(abr.summe) + ")")
 		g = self.geldInKasse + letzteBest.pfandRueckgabe - letzteBest.trinkgeld
-		print "  mit Pfandrückgabe (+" + geld(letzteBest.pfandRueckgabe).strip() + ") und Trinkgeld(-" + geld(letzteBest.trinkgeld).strip() + ") :", geld(g), "(~= -Wert der noch vorhandenen Flaschen)"
+		print "  mit Pfandrückgabe (+" + geld(letzteBest.pfandRueckgabe) + ") und Trinkgeld(-" + geld(letzteBest.trinkgeld) + ") :", geld(g), "(~= -Wert der noch vorhandenen Flaschen)"
 		
 	def dump(self, desc):
 		print "Geld in Kasse nach", desc, ":", geld(self.geldInKasse), " noch eine Rechnung offen" if self.rechnungNochOffen else ""
@@ -115,7 +115,7 @@ class Bestellung:
 		if self.bezahlt:
 			if self.trinkgeld == None: raise Err, "Trinkgeld wurde in Bestellung vom " + self.date + " nicht angegeben"
 			self.pfandRueckgabe = self.betrag + self.pfand - self.bezahlt
-			print "  bezahlt:", geld(self.bezahlt).strip(), " Differenz (Pfandrückgabe):", geld(self.pfandRueckgabe).strip(), " Trinkgeld:", geld(self.trinkgeld).strip()
+			print "  bezahlt:", geld(self.bezahlt), " Differenz (Pfandrückgabe):", geld(self.pfandRueckgabe), " Trinkgeld:", geld(self.trinkgeld)
 		else:
 			print "  noch nicht bezahlt"
 		
@@ -301,9 +301,9 @@ def finalizeLetzteBestellung():
 	if letzteBestellung: # bisher keine Abrechnung, daher letzteBestellung != None
 		letzteBestellung.finalize()
 		if letzteBestellung.pfandRueckgabe:
-			raise Err, "Bestellung von " + letzteBestellung.date + " ohne nachfolgender Abrechnung, aber mit Pfandrückgabe " + geld(letzteBestellung.pfandRueckgabe).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
+			raise Err, "Bestellung von " + letzteBestellung.date + " ohne nachfolgender Abrechnung, aber mit Pfandrückgabe " + geld(letzteBestellung.pfandRueckgabe) + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
 		if letzteBestellung.trinkgeld:
-			raise Err, "Bestellung von " + letzteBestellung.date + " ohne nachfolgender Abrechnung, aber mit Trinkgeld " + geld(letzteBestellung.trinkgeld).strip() + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
+			raise Err, "Bestellung von " + letzteBestellung.date + " ohne nachfolgender Abrechnung, aber mit Trinkgeld " + geld(letzteBestellung.trinkgeld) + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
 		stand.handleBestellung(letzteBestellung)
 		letzteBestellung = None
 
