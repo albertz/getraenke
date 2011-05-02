@@ -216,9 +216,11 @@ class Abrechnung:
 	def __str__(self):
 		return "Abrechnung vom " + self.date
 
-	# wird ausgeführt vor dem handlen der letzten Bestellungen
-	# insbesondere sagt 'nochda', was zum Zeitpunkt *vor* dem *ankommen* der Bestellung da war
-	def preFinalize(self):
+	# wird ausgeführt vor dem Handlen der letzten Bestellungen
+	# 'nochda' sagt, was zum Zeitpunkt *vor* dem *Ankommen* der Bestellung da war
+	def finalize(self):
+		print "Abrechnung vom", self.date, ":"
+
 		if self.nochda is None: raise Err, "'noch da' wurde nicht in Abrechnung vom " + self.date + " angegeben"
 
 		# Verluste durch fehlende Flaschen ausrechnen
@@ -237,10 +239,7 @@ class Abrechnung:
 				del self.nochda[g]
 
 		print "noch vorhandene Flaschen:", self.nochda, geld(wertVonGetraenken(stand.getraenke))
-		
-	def finalize(self):
-		print "Abrechnung vom", self.date, ":"
-		
+
 		# zu bezahlende Beträge anhand Anzahl Flaschen
 		personen = {}
 		for (p,getraenke) in self.personen.items():
@@ -344,8 +343,7 @@ for l in f.readlines():
 		elif abrechnung:
 			if not letzteBestellung: raise Err, "Keine Bestellung zwischen letzter (" + abrechnung.date + ") und vorletzter Abrechnung"
 
-			abrechnung.preFinalize()
-			letzteBestellung.finalize()	
+			letzteBestellung.finalize()
 			abrechnung.finalize()
 			stand.handleAbrechnung(abrechnung)
 			stand.handleBestellung(letzteBestellung)
