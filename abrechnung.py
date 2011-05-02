@@ -9,33 +9,20 @@ import math
 dir = os.path.dirname(sys.argv[0])
 f = open(dir + "/abrechnung.txt")
 
+context = None
 
-getraenkeBezahltRE = re.compile("^bezahlt: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
-getraenkeTrinkgeldRE = re.compile("^Trinkgeld: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
+def exchook(exctype, value, tb):
+	print
+	print "----------------------------------------------"
+	print "Exception:", value
+	global context
+	print "Current context:", context
+	print "Traceback:"
+	import traceback
+	traceback.print_tb(tb)
 
-getraenkRE = re.compile("^" +
-	"(?P<Getraenk>[\w ]+) (?P<FlaschenAnzahl>\d+)x(?P<FlaschenInhalt>[0-9,.]+): *" +
-	"(?P<KaestenAnzahl>[0-9,.]+) *\* *(?P<KastenPreis>[0-9,.]+)" +
-	" *$", re.UNICODE)
-
-einkaufEinzelnRE = re.compile("^einzeln: +" +
-	"(?P<Getraenk>[\w ]+): +" +
-	"(?P<FlaschenAnzahl>[0-9,.]+) *\* *(?P<FlaschenPreis>[0-9,.]+)" +
-	" *$", re.UNICODE)
-
-leergutRE = re.compile("^Leergut: +" +
-	"(?P<Getraenk>[\w ]+): +" +
-	"(?P<KaestenAnzahl>[0-9,.]+) *\* *" +
-	"(?P<FlaschenAnzahl>\d+)x(?P<FlaschenInhalt>[0-9,.]+) +Kasten" +
-	" *$", re.UNICODE)
-
-
-class Err(Exception):
-	def __init__(self, txt):
-		self.txt = txt
-	def __str__(self):
-		# additional stuff for better readability
-		return "\n-------------------------------------------\n" + self.txt
+sys.excepthook = exchook
+Err = Exception
 
 def geld(v):
 	return str(round(v,2)) + " €"
@@ -98,6 +85,9 @@ class Bestellung:
 		self.trinkgeld = None
 		self.pfandRueckgabe = None
 
+	def __str__(self):
+		return "Bestellung vom " + self.date
+
 	def finalize(self):
 		for getraenkTyp in self.getraenke:
 			stand.getraenke[getraenkTyp] += self.getraenke[getraenkTyp]
@@ -108,7 +98,7 @@ class Bestellung:
 			" Pfand:", self.pfand, "€", \
 			" Summe:", self.betrag + self.pfand, "€"
 		if self.bezahlt:
-			if self.trinkgeld == None: raise Err, "Trinkgeld wurde in Bestellung vom " + self.date + " nicht angegeben"
+			if self.trinkgeld is None: raise Err, "Trinkgeld wurde in Bestellung vom " + self.date + " nicht angegeben"
 			self.pfandRueckgabe = self.betrag + self.pfand - self.bezahlt
 			print "  bezahlt:", geld(self.bezahlt), " Differenz (Pfandrückgabe):", geld(self.pfandRueckgabe), " Trinkgeld:", geld(self.trinkgeld)
 		else:
@@ -124,16 +114,34 @@ class Bestellung:
 		raise Err, "Getränk " + name + " unbekannt!"
 
 	def handle(self, l):
+		getraenkeTrinkgeldRE = re.compile("^Trinkgeld: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
 		m = getraenkeTrinkgeldRE.match(l)
 		if m:
 			self.trinkgeld = float(m.group("Betrag").replace(",","."))
 			return
 
+		getraenkeBezahltRE = re.compile("^bezahlt: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
 		m = getraenkeBezahltRE.match(l)
 		if m:
 			self.bezahlt = float(m.group("Betrag").replace(",","."))
 			return
-		
+
+		getraenkRE = re.compile("^" +
+			"(?P<Getraenk>[\w ]+) (?P<FlaschenAnzahl>\d+)x(?P<FlaschenInhalt>[0-9,.]+): *" +
+			"(?P<KaestenAnzahl>[0-9,.]+) *\* *(?P<KastenPreis>[0-9,.]+)" +
+			" *$", re.UNICODE)
+
+		einkaufEinzelnRE = re.compile("^einzeln: +" +
+			"(?P<Getraenk>[\w ]+): +" +
+			"(?P<FlaschenAnzahl>[0-9,.]+) *\* *(?P<FlaschenPreis>[0-9,.]+)" +
+			" *$", re.UNICODE)
+
+		leergutRE = re.compile("^Leergut: +" +
+			"(?P<Getraenk>[\w ]+): +" +
+			"(?P<KaestenAnzahl>[0-9,.]+) *\* *" +
+			"(?P<FlaschenAnzahl>\d+)x(?P<FlaschenInhalt>[0-9,.]+) +Kasten" +
+			" *$", re.UNICODE)
+
 		m1 = einkaufEinzelnRE.match(l)
 		m2 = leergutRE.match(l)
 		m3 = getraenkRE.match(l)
@@ -199,6 +207,9 @@ class Abrechnung:
 		self.nochda = None
 		self.fehltGeldFlaschen = None
 		self.betragForChecking = None
+
+	def __str__(self):
+		return "Abrechnung vom " + self.date
 
 	def preFinalize(self):
 		if self.nochda is None: raise Err, "'noch da' wurde nicht in Abrechnung vom " + self.date + " angegeben"
@@ -338,7 +349,8 @@ for l in f.readlines():
 			abrechnung = None
 		else:
 			raise Err, "Error, '.' only allowed in context (Abrechnung oder Bestellung)"
-			
+
+		context = None
 		continue
 	
 	if bestellung:
@@ -351,13 +363,13 @@ for l in f.readlines():
 		bestellungTitleRE = re.compile("^Bestellung +(?P<date>.*): *$", re.IGNORECASE)
 		b = bestellungTitleRE.match(l)
 		if b:
-			bestellung = Bestellung(b.group("date"))
+			context = bestellung = Bestellung(b.group("date"))
 			continue
 
 		abrechnungTitleRE = re.compile("^Abrechnung +(?P<date>.*): *$", re.IGNORECASE)
 		a = abrechnungTitleRE.match(l)
 		if a:
-			abrechnung = Abrechnung(a.group("date"))
+			context = abrechnung = Abrechnung(a.group("date"))
 			continue
 
 		raise Err, "Error, I don't understand (no context): " + l
