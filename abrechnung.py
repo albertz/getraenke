@@ -37,17 +37,17 @@ class Stand:
 		self.getraenke = {}
 		for g in getraenkTypen: self.getraenke[g] = 0
 
-	def handleBestellung(self, best):
-		if best.bezahlt:
-			self.geldInKasse -= best.bezahlt + best.trinkgeld
-			desc = "-" + geld(best.bezahlt)
+	def handleBestellung(self, bestellung):
+		if bestellung.bezahlt:
+			self.geldInKasse -= bestellung.bezahlt + bestellung.trinkgeld
+			desc = "-" + geld(bestellung.bezahlt)
 		else:
 			self.rechnungNochOffen = best
 			desc = "offen"
 
 		for g in getraenkTypen:
-			if g in best.preise:
-				self.getraenkePreise[g] = best.preise[g]
+			if g in bestellung.preise:
+				self.getraenkePreise[g] = bestellung.preise[g]
 
 		self.dump("Bestellung (" + desc + ")")
 		
