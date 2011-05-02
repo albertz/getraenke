@@ -35,6 +35,7 @@ class Stand:
 		self.geldInKasse = 0.0
 		self.getraenkePreise = {}
 		self.getraenke = {}
+		
 		for g in getraenkTypen: self.getraenke[g] = 0
 
 	def handleBestellung(self, bestellung):
@@ -64,6 +65,7 @@ class Stand:
 stand = Stand()
 
 def wertVonGetraenken(getraenke):
+	global stand, getraenkTypen
 	geld = 0.0
 	for g in getraenkTypen:
 		if g in getraenke:
@@ -75,6 +77,7 @@ def wertVonGetraenken(getraenke):
 
 class Bestellung:
 	def __init__(self, date):
+		global getraenkTypen
 		self.date = date
 		self.getraenke = {}
 		for g in getraenkTypen: self.getraenke[g] = 0
@@ -219,6 +222,7 @@ class Abrechnung:
 		#print "theoretisch noch da:", stand.getraenke, "; noch da:", self.nochda
 		fehlt = {}
 		fehltGeldFlaschen = 0
+		global getraenkTypen
 		for g in getraenkTypen:
 			if not g in self.nochda: self.nochda[g] = 0
 			f = stand.getraenke[g] - self.nochda[g]
