@@ -209,7 +209,6 @@ class Abrechnung:
 		self.personen = {}
 		self.summe = None
 		self.nochda = None
-		self.fehltGeldFlaschen = None
 		self.betragForChecking = None
 
 	def __str__(self):
@@ -221,17 +220,13 @@ class Abrechnung:
 		# Verluste durch fehlende Flaschen ausrechnen
 		#print "theoretisch noch da:", stand.getraenke, "; noch da:", self.nochda
 		fehlt = {}
-		fehltGeldFlaschen = 0
 		global getraenkTypen
 		for g in getraenkTypen:
 			if not g in self.nochda: self.nochda[g] = 0
 			f = stand.getraenke[g] - self.nochda[g]
 			if f != 0: fehlt[g] = f
-			# nur den wirklich fehlenden Betrag berechnen -- ignoriere, wenn mehr berechnet wurde als eigentlich da war
-			if f > 0: fehltGeldFlaschen += f * stand.getraenkePreise[g] 
 			stand.getraenke[g] = self.nochda[g]
-		if len(fehlt) > 0: print "nach Abrechnung vom", self.date, "fehlt:", fehlt, geld(fehltGeldFlaschen)
-		self.fehltGeldFlaschen = fehltGeldFlaschen
+		if len(fehlt) > 0: print "nach Abrechnung vom", self.date, "fehlt:", fehlt
 
 		for g in getraenkTypen:
 			if self.nochda[g] == 0:
