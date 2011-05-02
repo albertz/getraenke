@@ -103,8 +103,9 @@ class Bestellung:
 			print "  bezahlt:", geld(self.bezahlt), " Differenz (Pfandrückgabe):", geld(self.pfandRueckgabe), " Trinkgeld:", geld(self.trinkgeld)
 		else:
 			print "  noch nicht bezahlt"
-		
-	def getraenkTyp(self, name):
+
+	@staticmethod
+	def getraenkTyp(name):
 		if "Apfelschorle" in name: return "A"
 		if "Kastell" in name: return "Wasser"
 		if "Wasser" in name: return "Wasser"
@@ -243,7 +244,6 @@ class Abrechnung:
 			psum = 0
 			for (g,count) in getraenke.items():
 				psum += stand.getraenkePreise[g] * count
-			#print p, ":", sum
 			personen[p] = psum
 
 		bezahlenInsg = sum(personen.itervalues())
@@ -270,7 +270,7 @@ class Abrechnung:
 		if abs(self.summe - self.betragForChecking) >= 0.01:
 			raise Err, "Eingetragener Betrag " + geld(self.betragForChecking) + " weicht um " + geld(abs(self.summe - self.betragForChecking)) + " von ausgerechneter Summe ab in Abrechnung vom " + self.date
 
-	def parse(self, data):
+	def _parseGetraenke(self, data):
 		getraenke = {}
 		for e in [ re.match("^(\w+) ([0-9]+)$", e).groups() for e in re.split(" *, *", data) ]:
 			if not e[0] in getraenkTypen: raise Err, "Getränk Typ " + e[0] + " unbekannt in '" + data + "' von Abrechnung vom " + self.date
@@ -297,17 +297,17 @@ class Abrechnung:
 		m = abrechnRE.match(l)
 		if not m: raise Err, "Error, I don't understand (context Abrechnung): " + l
 
-		Typ = m.group("type")
-		Getraenke = self.parse(m.group("data"))
+		typ = m.group("type")
+		getraenke = self._parseGetraenke(m.group("data"))
 		
-		if Typ == "noch da":
+		if typ == "noch da":
 			if self.nochda: raise Err, "'noch da' wurde doppelt angegeben in Abrechnung " + self.date
-			self.nochda = Getraenke
+			self.nochda = getraenke
 
 		else:
-			if Typ in self.personen: raise Err, "Person " + Typ + " doppelt angegeben in Abrechnung vom " + self.date + " in Zeile '" + l + "', bisherige Daten: " + repr(self.personen)
-			self.personen[Typ] = Getraenke
-			for (g,count) in Getraenke.items():
+			if typ in self.personen: raise Err, "Person " + typ + " doppelt angegeben in Abrechnung vom " + self.date + " in Zeile '" + l + "', bisherige Daten: " + repr(self.personen)
+			self.personen[typ] = getraenke
+			for (g,count) in getraenke.items():
 				stand.getraenke[g] -= count
 
 
