@@ -36,32 +36,41 @@ class Stand:
 		self.geldInKasse = 0.0
 		self.getraenkePreise = {}
 		self.getraenke = dict(izip(getraenkTypen, repeat(0)))
+		self.awaitingGetraenke = dict(izip(getraenkTypen, repeat(0)))
 		self.letzteBestExtra = 0.0
-
+		self.neueGetraenkePreise = None
+		
+	def updatePreise(self):
+		if self.neueGetraenkePreise is not None:
+			self.getraenkePreise = self.neueGetraenkePreise
+			self.neueGetraenkePreise = None
+			
 	def handleBestellung(self, bestellung):
 		if bestellung.bezahlt:
-			self.geldInKasse -= bestellung.bezahlt + bestellung.trinkgeld
-			desc = "-" + geld(bestellung.bezahlt)
+			betrag = bestellung.bezahlt + bestellung.trinkgeld
+			self.geldInKasse -= betrag
+			desc = "-" + geld(betrag)
 		else:
 			self.rechnungNochOffen = bestellung
 			desc = "offen"
 
+		self.neueGetraenkePreise = dict(self.getraenkePreise) or self.getraenkePreise
 		for g in getraenkTypen:
 			if g in bestellung.preise:
 				self.getraenkePreise[g] = bestellung.preise[g]
-
+		
 		self.dump("Bestellung (" + desc + ")")
 		
 	def handleAbrechnung(self, abr):
 		if self.rechnungNochOffen: raise Err, "kann Abrechnung nicht machen, wenn noch eine Rechnung offen steht; offen stehende Rechnung vom " + self.rechnungNochOffen.date
-		self.geldInKasse += abr.summe
-		self.dump("Abrechnung (+" + geld(abr.summe) + ")")
+		self.geldInKasse += abr.betragForChecking
+		self.dump("Abrechnung (+" + geld(abr.betragForChecking) + ")")
 		g = self.geldInKasse + self.letzteBestExtra
 		print "  mit Pfandrückgabe und Trinkgeld (+" + geld(self.letzteBestExtra) + ") :", geld(g), "(~= -Wert der noch vorhandenen Flaschen)"
 		
 	def dump(self, desc):
 		print "Geld in Kasse nach", desc, ":", geld(self.geldInKasse), " noch eine Rechnung offen" if self.rechnungNochOffen else ""
-		
+		print "  Wert der noch vorhandenen und erwarteten Flaschen:", geld(wertVonGetraenken(self.getraenke) + wertVonGetraenken(self.awaitingGetraenke))
 stand = Stand()
 
 def wertVonGetraenken(getraenke):
@@ -92,8 +101,13 @@ class Bestellung:
 		return "Bestellung vom " + self.date
 
 	def finalize(self):
+		# vorgehende Bestellungen sollten inzwischen angekommen sein
+		for t in getraenkTypen:
+			stand.getraenke[t] += stand.awaitingGetraenke[t]
+			stand.awaitingGetraenke[t] = 0
+
 		for getraenkTyp in self.getraenke:
-			stand.getraenke[getraenkTyp] += self.getraenke[getraenkTyp]
+			stand.awaitingGetraenke[getraenkTyp] += self.getraenke[getraenkTyp]
 
 		print \
 			"Bestellung", self.date, ":", \
@@ -102,9 +116,9 @@ class Bestellung:
 			" Summe:", self.betrag + self.pfand, "€"
 		if self.bezahlt:
 			if self.trinkgeld is None: raise Err, "Trinkgeld wurde in Bestellung vom " + self.date + " nicht angegeben"
-			self.pfandRueckgabe = self.betrag + self.pfand - self.bezahlt
-			stand.letzteBestExtra += self.pfandRueckgabe - self.trinkgeld
-			print "  bezahlt:", geld(self.bezahlt), " Differenz (Pfandrückgabe):", geld(self.pfandRueckgabe), " Trinkgeld:", geld(self.trinkgeld)
+			pfandRueckgabe = self.betrag + self.pfand - self.bezahlt
+			print "  bezahlt:", geld(self.bezahlt), " Differenz (Pfandrückgabe):", geld(pfandRueckgabe), " Trinkgeld:", geld(self.trinkgeld)
+			stand.letzteBestExtra += self.pfand - self.trinkgeld
 		else:
 			print "  noch nicht bezahlt"
 			raise Err, "Bestellung noch nicht bezahlt"
@@ -223,22 +237,21 @@ class Abrechnung:
 
 		if self.nochda is None: raise Err, "'noch da' wurde nicht in Abrechnung vom " + self.date + " angegeben"
 
-		# Verluste durch fehlende Flaschen ausrechnen
-		#print "theoretisch noch da:", stand.getraenke, "; noch da:", self.nochda
+		#print "  sollte noch da sein:", stand.getraenke
+		#print "  war noch da:", self.nochda
 		fehlt = {}
-		global getraenkTypen
-		for g in getraenkTypen:
-			if not g in self.nochda: self.nochda[g] = 0
-			f = stand.getraenke[g] - self.nochda[g]
-			if f != 0: fehlt[g] = f
-			stand.getraenke[g] = self.nochda[g]
-		if len(fehlt) > 0: print "nach Abrechnung vom", self.date, "fehlt:", fehlt
+		for t in getraenkTypen:
+			if t not in self.nochda: self.nochda[t] = 0
+			f = stand.getraenke[t] - self.nochda[t]
+			if f != 0: fehlt[t] = f
+			stand.getraenke[t] = self.nochda[t]
+		print "  es fehlt:", fehlt
 
-		for g in getraenkTypen:
-			if self.nochda[g] == 0:
-				del self.nochda[g]
+		for t in getraenkTypen:
+			stand.getraenke[t] += stand.awaitingGetraenke[t]
+			stand.awaitingGetraenke[t] = 0
 
-		print "noch vorhandene Flaschen:", self.nochda, geld(wertVonGetraenken(stand.getraenke))
+		#print "  jetzt mit neuen:", stand.getraenke
 
 		# zu bezahlende Beträge anhand Anzahl Flaschen
 		personen = {}
@@ -250,9 +263,11 @@ class Abrechnung:
 
 		bezahlenInsg = sum(personen.itervalues())
 		print "  zu bezahlen:", geld(bezahlenInsg), "(insgesamt ohne Verluste gerechnet)"
-		print "  Stand:", geld(stand.geldInKasse + wertVonGetraenken(self.nochda)), "(Kasse + Wert von noch vorhandenen Getränken)"
-		#if not letzteBest.pfandRueckgabe: raise Err, "letzte Bestellung vom " + letzteBest.date + " wurde noch nicht bezahlt, daher noch unbekannt, wie viel Pfand wir zurückbekommen, daher kann fehlendes Geld nicht berechnet werden"
-		fehltGeld = - (stand.geldInKasse + wertVonGetraenken(self.nochda) + stand.letzteBestExtra + bezahlenInsg)
+		#print "  in Kasse:", geld(stand.geldInKasse)
+		#print "  vorhandene Getränke ohne Pfand:", geld(wertVonGetraenken(stand.getraenke))
+		standBetrag = stand.geldInKasse + wertVonGetraenken(stand.getraenke)
+		print "  Stand:", geld(standBetrag), "(Kasse + Wert von noch vorhandenen Getränken ohne Pfand)"
+		fehltGeld = - (standBetrag + stand.letzteBestExtra + bezahlenInsg)
 		stand.letzteBestExtra = 0.0
 		print "  fehlendes Geld:", geld(fehltGeld), "(-Stand - zu bezahlen - letzte Pfandrückgabe + Trinkgeld)"
 		# in seltenen Fällen, wenn Pfand wiedergefunden wurde o.Ä., haben wir fehltGeld<0, also kriegen wir etwas wieder
@@ -271,7 +286,7 @@ class Abrechnung:
 
 		if self.betragForChecking is None: raise Err, "'Betrag' wurde nicht in Abrechnung vom " + self.date + " angegeben"
 		if abs(self.summe - self.betragForChecking) >= 0.01:
-			raise Err, "Eingetragener Betrag " + geld(self.betragForChecking) + " weicht um " + geld(abs(self.summe - self.betragForChecking)) + " von ausgerechneter Summe ab in Abrechnung vom " + self.date
+			print "  WARNUNG: Abgerechneter Betrag weicht ab:", geld(self.betragForChecking)
 
 	def _parseGetraenke(self, data):
 		getraenke = {}
@@ -314,21 +329,9 @@ class Abrechnung:
 				stand.getraenke[g] -= count
 
 
+
 bestellung = None
-letzteBestellung = None
 abrechnung = None
-
-def finalizeLetzteBestellung():
-	global letzteBestellung, stand
-	if letzteBestellung: # bisher keine Abrechnung, daher letzteBestellung != None
-		letzteBestellung.finalize()
-		if letzteBestellung.pfandRueckgabe:
-			raise Err, "Bestellung von " + letzteBestellung.date + " ohne nachfolgender Abrechnung, aber mit Pfandrückgabe " + geld(letzteBestellung.pfandRueckgabe) + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
-		if letzteBestellung.trinkgeld:
-			raise Err, "Bestellung von " + letzteBestellung.date + " ohne nachfolgender Abrechnung, aber mit Trinkgeld " + geld(letzteBestellung.trinkgeld) + " -> Verlust kann wegen fehlender Abrechnung nicht korrekt berechnet werden"
-		stand.handleBestellung(letzteBestellung)
-		letzteBestellung = None
-
 
 for l in f.readlines():
 	l = l.strip()	
@@ -336,19 +339,16 @@ for l in f.readlines():
 	if len(l) == 0: continue
 	if l == ".":
 		if bestellung:
-			finalizeLetzteBestellung()
-			letzteBestellung = bestellung
+			stand.updatePreise()
+			bestellung.finalize()
+			stand.handleBestellung(bestellung)
 			bestellung = None
-			
-		elif abrechnung:
-			if not letzteBestellung: raise Err, "Keine Bestellung zwischen letzter (" + abrechnung.date + ") und vorletzter Abrechnung"
 
-			letzteBestellung.finalize()
+		elif abrechnung:
 			abrechnung.finalize()
 			stand.handleAbrechnung(abrechnung)
-			stand.handleBestellung(letzteBestellung)
-			letzteBestellung = None
 			abrechnung = None
+
 		else:
 			raise Err, "Error, '.' only allowed in context (Abrechnung oder Bestellung)"
 
@@ -376,4 +376,3 @@ for l in f.readlines():
 
 		raise Err, "Error, I don't understand (no context): " + l
 		
-finalizeLetzteBestellung()
