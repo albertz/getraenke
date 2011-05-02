@@ -43,7 +43,7 @@ class Stand:
 			self.geldInKasse -= bestellung.bezahlt + bestellung.trinkgeld
 			desc = "-" + geld(bestellung.bezahlt)
 		else:
-			self.rechnungNochOffen = best
+			self.rechnungNochOffen = bestellung
 			desc = "offen"
 
 		for g in getraenkTypen:
