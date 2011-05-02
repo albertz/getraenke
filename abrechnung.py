@@ -5,6 +5,7 @@ import os
 import sys
 import re
 import math
+from itertools import *
 
 dir = os.path.dirname(sys.argv[0])
 f = open(dir + "/abrechnung.txt")
@@ -34,9 +35,8 @@ class Stand:
 		self.rechnungNochOffen = None
 		self.geldInKasse = 0.0
 		self.getraenkePreise = {}
-		self.getraenke = {}
-		
-		for g in getraenkTypen: self.getraenke[g] = 0
+		self.getraenke = dict(izip(getraenkTypen, repeat(0)))
+		self.letzteBestExtra = 0.0
 
 	def handleBestellung(self, bestellung):
 		if bestellung.bezahlt:
@@ -52,12 +52,12 @@ class Stand:
 
 		self.dump("Bestellung (" + desc + ")")
 		
-	def handleAbrechnung(self, abr, letzteBest):
+	def handleAbrechnung(self, abr):
 		if self.rechnungNochOffen: raise Err, "kann Abrechnung nicht machen, wenn noch eine Rechnung offen steht; offen stehende Rechnung vom " + self.rechnungNochOffen.date
 		self.geldInKasse += abr.summe
 		self.dump("Abrechnung (+" + geld(abr.summe) + ")")
-		g = self.geldInKasse + letzteBest.pfandRueckgabe - letzteBest.trinkgeld
-		print "  mit Pfandrückgabe (+" + geld(letzteBest.pfandRueckgabe) + ") und Trinkgeld(-" + geld(letzteBest.trinkgeld) + ") :", geld(g), "(~= -Wert der noch vorhandenen Flaschen)"
+		g = self.geldInKasse + self.letzteBestExtra
+		print "  mit Pfandrückgabe und Trinkgeld (+" + geld(self.letzteBestExtra) + ") :", geld(g), "(~= -Wert der noch vorhandenen Flaschen)"
 		
 	def dump(self, desc):
 		print "Geld in Kasse nach", desc, ":", geld(self.geldInKasse), " noch eine Rechnung offen" if self.rechnungNochOffen else ""
@@ -103,9 +103,11 @@ class Bestellung:
 		if self.bezahlt:
 			if self.trinkgeld is None: raise Err, "Trinkgeld wurde in Bestellung vom " + self.date + " nicht angegeben"
 			self.pfandRueckgabe = self.betrag + self.pfand - self.bezahlt
+			stand.letzteBestExtra += self.pfandRueckgabe - self.trinkgeld
 			print "  bezahlt:", geld(self.bezahlt), " Differenz (Pfandrückgabe):", geld(self.pfandRueckgabe), " Trinkgeld:", geld(self.trinkgeld)
 		else:
 			print "  noch nicht bezahlt"
+			raise Err, "Bestellung noch nicht bezahlt"
 
 	@staticmethod
 	def getraenkTyp(name):
@@ -214,6 +216,8 @@ class Abrechnung:
 	def __str__(self):
 		return "Abrechnung vom " + self.date
 
+	# wird ausgeführt vor dem handlen der letzten Bestellungen
+	# insbesondere sagt 'nochda', was zum Zeitpunkt *vor* dem *ankommen* der Bestellung da war
 	def preFinalize(self):
 		if self.nochda is None: raise Err, "'noch da' wurde nicht in Abrechnung vom " + self.date + " angegeben"
 
@@ -234,7 +238,7 @@ class Abrechnung:
 
 		print "noch vorhandene Flaschen:", self.nochda, geld(wertVonGetraenken(stand.getraenke))
 		
-	def finalize(self, letzteBest):
+	def finalize(self):
 		print "Abrechnung vom", self.date, ":"
 		
 		# zu bezahlende Beträge anhand Anzahl Flaschen
@@ -248,8 +252,9 @@ class Abrechnung:
 		bezahlenInsg = sum(personen.itervalues())
 		print "  zu bezahlen:", geld(bezahlenInsg), "(insgesamt ohne Verluste gerechnet)"
 		print "  Stand:", geld(stand.geldInKasse + wertVonGetraenken(self.nochda)), "(Kasse + Wert von noch vorhandenen Getränken)"
-		if not letzteBest.pfandRueckgabe: raise Err, "letzte Bestellung vom " + letzteBest.date + " wurde noch nicht bezahlt, daher noch unbekannt, wie viel Pfand wir zurückbekommen, daher kann fehlendes Geld nicht berechnet werden"
-		fehltGeld = - (stand.geldInKasse + wertVonGetraenken(self.nochda) + letzteBest.pfandRueckgabe - letzteBest.trinkgeld + bezahlenInsg)
+		#if not letzteBest.pfandRueckgabe: raise Err, "letzte Bestellung vom " + letzteBest.date + " wurde noch nicht bezahlt, daher noch unbekannt, wie viel Pfand wir zurückbekommen, daher kann fehlendes Geld nicht berechnet werden"
+		fehltGeld = - (stand.geldInKasse + wertVonGetraenken(self.nochda) + stand.letzteBestExtra + bezahlenInsg)
+		stand.letzteBestExtra = 0.0
 		print "  fehlendes Geld:", geld(fehltGeld), "(-Stand - zu bezahlen - letzte Pfandrückgabe + Trinkgeld)"
 		# in seltenen Fällen, wenn Pfand wiedergefunden wurde o.Ä., haben wir fehltGeld<0, also kriegen wir etwas wieder
 		# bei unserer allerersten Abrechnung ist es sogar noch mehr, weil eine ganze Menge Bier da berechnet wurde, die aber noch übrig war von früher
@@ -341,8 +346,8 @@ for l in f.readlines():
 
 			abrechnung.preFinalize()
 			letzteBestellung.finalize()	
-			abrechnung.finalize(letzteBestellung)
-			stand.handleAbrechnung(abrechnung, letzteBestellung)
+			abrechnung.finalize()
+			stand.handleAbrechnung(abrechnung)
 			stand.handleBestellung(letzteBestellung)
 			letzteBestellung = None
 			abrechnung = None
