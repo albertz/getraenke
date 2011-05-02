@@ -297,17 +297,17 @@ class Abrechnung:
 		m = abrechnRE.match(l)
 		if not m: raise Err, "Error, I don't understand (context Abrechnung): " + l
 
-		typ = m.group("type")
-		getraenke = self._parseGetraenke(m.group("data"))
+		Typ = m.group("type")
+		Getraenke = self._parseGetraenke(m.group("data"))
 		
-		if typ == "noch da":
+		if Typ == "noch da":
 			if self.nochda: raise Err, "'noch da' wurde doppelt angegeben in Abrechnung " + self.date
-			self.nochda = getraenke
+			self.nochda = Getraenke
 
 		else:
-			if typ in self.personen: raise Err, "Person " + typ + " doppelt angegeben in Abrechnung vom " + self.date + " in Zeile '" + l + "', bisherige Daten: " + repr(self.personen)
-			self.personen[typ] = getraenke
-			for (g,count) in getraenke.items():
+			if Typ in self.personen: raise Err, "Person " + Typ + " doppelt angegeben in Abrechnung vom " + self.date + " in Zeile '" + l + "', bisherige Daten: " + repr(self.personen)
+			self.personen[Typ] = Getraenke
+			for (g,count) in Getraenke.items():
 				stand.getraenke[g] -= count
 
 
