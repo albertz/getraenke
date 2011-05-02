@@ -9,8 +9,6 @@ import math
 dir = os.path.dirname(sys.argv[0])
 f = open(dir + "/abrechnung.txt")
 
-bestellungTitleRE = re.compile("^Bestellung +(?P<date>.*): *$", re.IGNORECASE)
-abrechnungTitleRE = re.compile("^Abrechnung +(?P<date>.*): *$", re.IGNORECASE)
 
 getraenkeBezahltRE = re.compile("^bezahlt: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
 getraenkeTrinkgeldRE = re.compile("^Trinkgeld: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
@@ -31,9 +29,6 @@ leergutRE = re.compile("^Leergut: +" +
 	"(?P<FlaschenAnzahl>\d+)x(?P<FlaschenInhalt>[0-9,.]+) +Kasten" +
 	" *$", re.UNICODE)
 
-abrechnRE = re.compile("^" +
-	"(?P<type>[\w ]+): (?P<data>(\w+ [0-9]+, *)*\w+ [0-9]+)" +
-	" *$", re.UNICODE)
 
 class Err(Exception):
 	def __init__(self, txt):
@@ -203,9 +198,10 @@ class Abrechnung:
 		self.summe = None
 		self.nochda = None
 		self.fehltGeldFlaschen = None
-	
+		self.betragForChecking = None
+
 	def preFinalize(self):
-		if self.nochda == None: raise Err, "'noch da' wurde nicht in Abrechnung vom " + self.date + " angegeben"
+		if self.nochda is None: raise Err, "'noch da' wurde nicht in Abrechnung vom " + self.date + " angegeben"
 
 		# Verluste durch fehlende Flaschen ausrechnen
 		#print "theoretisch noch da:", stand.getraenke, "; noch da:", self.nochda
@@ -258,8 +254,11 @@ class Abrechnung:
 
 		self.summe = sum(personen.itervalues())
 		print "  Insgesamt:", geld(self.summe)
-		
-			
+
+		if self.betragForChecking is None: raise Err, "'Betrag' wurde nicht in Abrechnung vom " + self.date + " angegeben"
+		if abs(self.summe - self.betragForChecking) >= 0.01:
+			raise Err, "Eingetragener Betrag " + geld(self.betragForChecking) + " weicht um " + geld(abs(self.summe - self.betragForChecking)) + " von ausgerechneter Summe ab in Abrechnung vom " + self.date
+
 	def parse(self, data):
 		getraenke = {}
 		for e in [ re.match("^(\w+) ([0-9]+)$", e).groups() for e in re.split(" *, *", data) ]:
@@ -274,7 +273,16 @@ class Abrechnung:
 			if self.nochda: raise Err, "'noch da' wurde doppelt angegeben in Abrechnung " + self.date
 			self.nochda = dict()
 			return
+
+		m = re.match("^Betrag: (?P<Betrag>[0-9,.]+) *$", l)
+		if m:
+			if self.betragForChecking: raise Err, "'Betrag' wurde doppelt angegeben in Abrechnung " + self.date
+			self.betragForChecking = float(m.group("Betrag").replace(",","."))
+			return
 		
+		abrechnRE = re.compile("^" +
+			"(?P<type>[\w ]+): (?P<data>(\w+ [0-9]+, *)*\w+ [0-9]+)" +
+			" *$", re.UNICODE)
 		m = abrechnRE.match(l)
 		if not m: raise Err, "Error, I don't understand (context Abrechnung): " + l
 
@@ -285,7 +293,7 @@ class Abrechnung:
 			if self.nochda: raise Err, "'noch da' wurde doppelt angegeben in Abrechnung " + self.date
 			self.nochda = Getraenke
 
-		else:	
+		else:
 			if Typ in self.personen: raise Err, "Person " + Typ + " doppelt angegeben in Abrechnung vom " + self.date + " in Zeile '" + l + "', bisherige Daten: " + repr(self.personen)
 			self.personen[Typ] = Getraenke
 			for (g,count) in Getraenke.items():
@@ -340,11 +348,13 @@ for l in f.readlines():
 		abrechnung.handle(l)
 	
 	else:
+		bestellungTitleRE = re.compile("^Bestellung +(?P<date>.*): *$", re.IGNORECASE)
 		b = bestellungTitleRE.match(l)
 		if b:
 			bestellung = Bestellung(b.group("date"))
 			continue
-	
+
+		abrechnungTitleRE = re.compile("^Abrechnung +(?P<date>.*): *$", re.IGNORECASE)
 		a = abrechnungTitleRE.match(l)
 		if a:
 			abrechnung = Abrechnung(a.group("date"))
