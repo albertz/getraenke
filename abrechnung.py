@@ -28,7 +28,7 @@ Err = Exception
 def geld(v):
 	return str(round(v,2)) + " €"
 
-getraenkTypen = set([ "A", "Wasser", "Cola", "O", "Bier" ])
+getraenkTypen = set([ "A", "Wasser", "Wasser-still", "Cola", "O", "Bier" ])
 
 class Stand:
 	def __init__(self):
@@ -77,8 +77,8 @@ def wertVonGetraenken(getraenke):
 	global stand, getraenkTypen
 	geld = 0.0
 	for g in getraenkTypen:
-		if g in getraenke:
-			#print g, "da:", self.getraenke[g], "  preis:", self.getraenkePreise[g]
+		if g in getraenke and getraenke[g] != 0:
+			#print g, "da:", getraenke[g], "  preis:", stand.getraenkePreise[g]
 			geld += getraenke[g] * stand.getraenkePreise[g] 
 	return geld
 
@@ -128,6 +128,7 @@ class Bestellung:
 		if "Apfelschorle" in name: return "A"
 		if "Kastell" in name: return "Wasser"
 		if "Wasser" in name: return "Wasser"
+		if "Gerollstein still" in name: return "Wasser-still"
 		if "Cola" in name: return "Cola"
 		if "Mezzomix" in name: return "Cola"
 		if "Orange" in name: return "O"
