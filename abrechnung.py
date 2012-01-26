@@ -36,13 +36,7 @@ class Stand:
 		self.getraenke = dict(izip(getraenkTypen, repeat(0)))
 		self.awaitingGetraenke = dict(izip(getraenkTypen, repeat(0)))
 		self.letzteBestExtra = 0.0
-		self.neueGetraenkePreise = None
 		
-	def updatePreise(self):
-		if self.neueGetraenkePreise is not None:
-			self.getraenkePreise = self.neueGetraenkePreise
-			self.neueGetraenkePreise = None
-			
 	def handleBestellung(self, bestellung):
 		if bestellung.bezahlt:
 			betrag = bestellung.bezahlt + bestellung.trinkgeld
@@ -52,7 +46,6 @@ class Stand:
 			self.rechnungNochOffen = bestellung
 			desc = "offen"
 
-		self.neueGetraenkePreise = dict(self.getraenkePreise) or self.getraenkePreise
 		for g in getraenkTypen:
 			if g in bestellung.preise:
 				self.getraenkePreise[g] = bestellung.preise[g]
@@ -290,7 +283,7 @@ class Abrechnung:
 
 	def _parseGetraenke(self, data):
 		getraenke = {}
-		for e in [ re.match("^(\w+) ([0-9]+)$", e).groups() for e in re.split(" *, *", data) ]:
+		for e in [ re.match("^([\w\-]+) ([0-9]+)$", e).groups() for e in re.split(" *, *", data) ]:
 			if not e[0] in getraenkTypen: raise Err, "Getränk Typ " + e[0] + " unbekannt in '" + data + "' von Abrechnung vom " + self.date
 			if e[0] in getraenke: raise Err, "Getränk Typ " + e[0] + " doppelt in '" + data + "' von Abrechnung vom " + self.date
 			getraenke[e[0]] = int(e[1])			
@@ -310,7 +303,7 @@ class Abrechnung:
 			return
 		
 		abrechnRE = re.compile("^" +
-			"(?P<type>[\w ]+): (?P<data>(\w+ [0-9]+, *)*\w+ [0-9]+)" +
+			"(?P<type>[\w ]+): (?P<data>([\w\-]+ [0-9]+, *)*[\w\-]+ [0-9]+)" +
 			" *$", re.UNICODE)
 		m = abrechnRE.match(l)
 		if not m: raise Err, "Error, I don't understand (context Abrechnung): " + l
@@ -339,7 +332,6 @@ for l in f.readlines():
 	if len(l) == 0: continue
 	if l == ".":
 		if bestellung:
-			stand.updatePreise()
 			bestellung.finalize()
 			stand.handleBestellung(bestellung)
 			bestellung = None
