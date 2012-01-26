@@ -15,12 +15,10 @@ context = None
 def exchook(exctype, value, tb):
 	print
 	print "----------------------------------------------"
-	print "Exception:", value
 	global context
 	print "Current context:", context
-	print "Traceback:"
 	import traceback
-	traceback.print_tb(tb)
+	traceback.print_exception(exctype, value, tb)
 
 sys.excepthook = exchook
 Err = Exception
