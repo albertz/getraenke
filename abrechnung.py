@@ -274,7 +274,9 @@ class Abrechnung:
 		for (p,psum) in personen.items():
 			print " ", p, ":", geld(psum)
 
-		self.summe = sum(personen.itervalues())
+		# We must do the round(x,2) because otherwise, this
+		# sum when printed via geld could differ from printed sum.
+		self.summe = sum([round(x,2) for x in personen.itervalues()])
 		print "  Insgesamt:", geld(self.summe)
 
 		if self.betragForChecking is None: raise Err, "'Betrag' wurde nicht in Abrechnung vom " + self.date + " angegeben"
