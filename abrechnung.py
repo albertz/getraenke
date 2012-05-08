@@ -1,6 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# TODO: (vom konvent 7.5.2012)
+# - Externe zahlen extra (entweder 15% mehr oder Pfandpreis)
+# - extra Geld wird auf Etagenkasse draufgerechnet
+#   -> extra Spalte, Etageneinnahmen 
+# - damit ein bisschen komplexere Abrechnung auch,
+#   wo genauer steht, wie viel ich am Ende zurück bekomme
+
 import os
 import sys
 import re
