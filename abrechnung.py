@@ -33,7 +33,11 @@ Err = Exception
 def geld(v):
 	return str(round(v,2)) + " €"
 
-getraenkTypen = set([ "A", "Wasser", "Wasser-still", "Cola", "O", "Bier" ])
+getraenkTypen = set([
+	"A", "Wasser", "Wasser-still", "Cola", "O", "Bier",
+	"Club Mate",
+	"Flora Power",
+	])
 
 class Stand:
 	def __init__(self):
@@ -125,12 +129,17 @@ class Bestellung:
 	def getraenkTyp(name):
 		if "Apfelschorle" in name: return "A"
 		if "Kastell" in name: return "Wasser"
+		if "Vulkanpark" in name: return "Wasser"
+		if "Engelbert Medium" in name: return "Wasser"
+		if "Engelbert Sprudel" in name: return "Wasser"
 		if "Wasser" in name: return "Wasser"
 		if "Gerollstein still" in name: return "Wasser-still"
 		if "Cola" in name: return "Cola"
 		if "Mezzomix" in name: return "Cola"
 		if "Orange" in name: return "O"
 		if "Bitburger" in name: return "Bier"
+		if "Club Mate" in name: return "Club Mate"
+		if "Flora Power" in name: return "Flora Power"
 		raise Err, "Getränk " + name + " unbekannt!"
 
 	def handle(self, l):
