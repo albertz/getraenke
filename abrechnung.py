@@ -8,11 +8,23 @@
 # - damit ein bisschen komplexere Abrechnung auch,
 #   wo genauer steht, wie viel ich am Ende zurück bekomme
 
+
 import os
 import sys
 import re
 import math
 from itertools import *
+
+try:
+	sys.path += [os.path.expanduser("~/Programmierung/py_better_exchook")]
+	import better_exchook
+	better_exchook.install()
+except:
+	print "failed to import better_exchook"
+	sys.excepthook(*sys.exc_info())
+	print "This is optional but you might want to get it from here:"
+	print "  https://github.com/albertz/py_better_exchook"
+	print
 
 dir = os.path.dirname(sys.argv[0])
 f = open(dir + "/abrechnung.txt")
@@ -138,11 +150,12 @@ class Bestellung:
 		if "Mezzomix" in name: return "Cola"
 		if "Orange" in name: return "O"
 		if "Bitburger" in name: return "Bier"
+		if u"Kölsch" == name: return "Bier"
 		if "Club Mate" in name: return "Club Mate"
 		if "Flora Power" in name: return "Flora Power"
-		raise Err, "Getränk " + name + " unbekannt!"
+		raise Err, "Getränk " + name.encode("utf-8") + " unbekannt!"
 
-	def handle(self, l):
+	def handle(self, l):		
 		getraenkeTrinkgeldRE = re.compile("^Trinkgeld: (?P<Betrag>[0-9,.]+) *$", re.UNICODE)
 		m = getraenkeTrinkgeldRE.match(l)
 		if m:
@@ -324,7 +337,7 @@ class Abrechnung:
 			"(?P<type>[\w ]+): (?P<data>([\w\-]+ [0-9]+, *)*[\w\-]+ [0-9]+)" +
 			" *$", re.UNICODE)
 		m = abrechnRE.match(l)
-		if not m: raise Err, "Error, I don't understand (context Abrechnung): " + l
+		if not m: raise Err, "Error, I don't understand (context Abrechnung): " + l.encode("utf-8")
 
 		Typ = m.group("type")
 		Getraenke = self._parseGetraenke(m.group("data"))
@@ -345,6 +358,7 @@ bestellung = None
 abrechnung = None
 
 for l in f.readlines():
+	if isinstance(l, str): l = l.decode("utf-8")
 	l = l.strip()	
 	if l.startswith("#"): continue
 	if len(l) == 0: continue
@@ -384,5 +398,5 @@ for l in f.readlines():
 			context = abrechnung = Abrechnung(a.group("date"))
 			continue
 
-		raise Err, "Error, I don't understand (no context): " + l
+		raise Err, "Error, I don't understand (no context): " + l.encode("utf-8")
 		
