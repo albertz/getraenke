@@ -236,7 +236,7 @@ class Bestellung:
 
 		if not m2: # not Leergut
 			if GetraenkTyp in self.preise and self.preise[GetraenkTyp] != FlaschenPreis:
-				raise Err, "Getränktyp " + GetraenkTyp + " doppelt und Preis unterschiedlich"
+				print (u"Warnung: Getränktyp %s (%s) doppelt und Preis unterschiedlich (alt: %f, neu: %f)" % (GetraenkTyp, Getraenk, self.preise[GetraenkTyp], FlaschenPreis)).encode("utf-8")
 			self.preise[GetraenkTyp] = FlaschenPreis
 			
 
@@ -314,7 +314,7 @@ class Abrechnung:
 
 	def _parseGetraenke(self, data):
 		getraenke = {}
-		for e in [ re.match("^([\w\-]+) ([0-9]+)$", e).groups() for e in re.split(" *, *", data) ]:
+		for e in [ re.match("^([\w\- ]+) ([0-9]+)$", e).groups() for e in re.split(" *, *", data) ]:
 			if not e[0] in getraenkTypen: raise Err, "Getränk Typ " + e[0] + " unbekannt in '" + data + "' von Abrechnung vom " + self.date
 			if e[0] in getraenke: raise Err, "Getränk Typ " + e[0] + " doppelt in '" + data + "' von Abrechnung vom " + self.date
 			getraenke[e[0]] = int(e[1])			
@@ -334,7 +334,7 @@ class Abrechnung:
 			return
 		
 		abrechnRE = re.compile("^" +
-			"(?P<type>[\w ]+): (?P<data>([\w\-]+ [0-9]+, *)*[\w\-]+ [0-9]+)" +
+			"(?P<type>[\w ]+): (?P<data>([\w\- ]+ [0-9]+, *)*[\w\- ]+ [0-9]+)" +
 			" *$", re.UNICODE)
 		m = abrechnRE.match(l)
 		if not m: raise Err, "Error, I don't understand (context Abrechnung): " + l.encode("utf-8")
