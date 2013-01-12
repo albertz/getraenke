@@ -359,8 +359,8 @@ abrechnung = None
 
 for l in f.readlines():
 	if isinstance(l, str): l = l.decode("utf-8")
-	l = l.strip()	
-	if l.startswith("#"): continue
+	if "#" in l: l = l[0:l.index("#")] # remove comments
+	l = l.strip()
 	if len(l) == 0: continue
 	if l == ".":
 		if bestellung:
