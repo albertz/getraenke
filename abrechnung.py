@@ -49,6 +49,7 @@ getraenkTypen = set([
 	"A", "Wasser", "Wasser-still", "Cola", "O", "Bier",
 	"Club Mate",
 	"Flora Power",
+	"Erdinger",
 	])
 
 class Stand:
@@ -139,6 +140,7 @@ class Bestellung:
 
 	@staticmethod
 	def getraenkTyp(name):
+		if name in getraenkTypen: return name
 		if "Apfelschorle" in name: return "A"
 		if "Kastell" in name: return "Wasser"
 		if "Vulkanpark" in name: return "Wasser"
@@ -151,8 +153,6 @@ class Bestellung:
 		if "Orange" in name: return "O"
 		if "Bitburger" in name: return "Bier"
 		if u"Kölsch" == name: return "Bier"
-		if "Club Mate" in name: return "Club Mate"
-		if "Flora Power" in name: return "Flora Power"
 		raise Err, "Getränk " + name.encode("utf-8") + " unbekannt!"
 
 	def handle(self, l):		
