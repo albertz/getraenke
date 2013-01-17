@@ -57,7 +57,13 @@ class Stand:
 		self.rechnungNochOffen = None
 		self.geldInKasse = 0.0
 		self.getraenkePreise = {}
+		# Vorhandene Getränke.
 		self.getraenke = dict(izip(getraenkTypen, repeat(0)))
+		# Von letzer Bestellung bekommt automatisch erstmal 'awaiting' Status.
+		# Erst bei nächster Bestellung (Bestellung.finalize) werden diese
+		# zu self.getraenke verschoben.
+		# D.h., nach einer Bestellung die folgenden Abrechnungen,
+		# bei 'noch da:' wird die letzte Bestellung noch nicht mitgerechnet.
 		self.awaitingGetraenke = dict(izip(getraenkTypen, repeat(0)))
 		self.letzteBestExtra = 0.0
 		
