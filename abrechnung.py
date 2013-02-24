@@ -321,8 +321,8 @@ class Abrechnung:
 	def _parseGetraenke(self, data):
 		getraenke = {}
 		for e in [ re.match("^([\w\- ]+) ([0-9]+)$", e).groups() for e in re.split(" *, *", data) ]:
-			if not e[0] in getraenkTypen: raise Err, "Getränk Typ " + e[0] + " unbekannt in '" + data + "' von Abrechnung vom " + self.date
-			if e[0] in getraenke: raise Err, "Getränk Typ " + e[0] + " doppelt in '" + data + "' von Abrechnung vom " + self.date
+			if not e[0] in getraenkTypen: raise Err, "Getraenk Typ " + e[0] + " unbekannt in '" + data + "' von Abrechnung vom " + self.date
+			if e[0] in getraenke: raise Err, "Getraenk Typ " + e[0] + " doppelt in '" + data + "' von Abrechnung vom " + self.date
 			getraenke[e[0]] = int(e[1])			
 		return getraenke
 	
