@@ -122,10 +122,13 @@ class Bestellung:
 		return "Bestellung vom " + self.date
 
 	def finalize(self):
-		# vorgehende Bestellungen sollten inzwischen angekommen sein
-		for t in getraenkTypen:
-			stand.getraenke[t] += stand.awaitingGetraenke[t]
-			stand.awaitingGetraenke[t] = 0
+		# TODO: war das so mal? ich hab jetzt den fall, dass zwei bestellungen hintereinander
+		# sind und danach eine abschließende abrechnung. in der Abrechnung Klasse
+		# schieben wir auch die stand.awaitingGetraenke nach stand.getranke.
+		# --(?) vorgehende Bestellungen sollten inzwischen angekommen sein
+		#for t in getraenkTypen:
+		#	stand.getraenke[t] += stand.awaitingGetraenke[t]
+		#	stand.awaitingGetraenke[t] = 0
 
 		for getraenkTyp in self.getraenke:
 			stand.awaitingGetraenke[getraenkTyp] += self.getraenke[getraenkTyp]
